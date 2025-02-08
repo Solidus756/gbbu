@@ -1,0 +1,66 @@
+/* Définition des couleurs personnalisées */
+:root {
+    --team-red: #e60000;       /* Rouge de l'équipe */
+    --team-black: #000000;     /* Noir de l'équipe */
+    --team-white: #ffffff;     /* Blanc de l'équipe */
+    --assoc-blue: #007bff;     /* Bleu de l'association */
+    --assoc-white: #ffffff;    /* Blanc de l'association */
+  }
+  
+  /* Style global */
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--assoc-white);
+    color: var(--team-black);
+  }
+  
+  /* Header avec un dégradé combinant les couleurs */
+  header {
+    background: linear-gradient(90deg, var(--team-red), var(--assoc-blue));
+    color: var(--team-white);
+    padding: 1rem;
+  }
+  header h1 {
+    margin: 0;
+  }
+  
+  /* Navigation */
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  nav li {
+    margin-right: 1rem;
+  }
+  nav a {
+    color: var(--team-white);
+    text-decoration: none;
+  }
+  
+  /* Contenu principal */
+  main {
+    padding: 1rem;
+  }
+  
+  /* Footer */
+  footer {
+    background-color: var(--team-black);
+    color: var(--team-white);
+    text-align: center;
+    padding: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  /* Responsive design : adaptation pour écrans étroits */
+  @media (max-width: 600px) {
+    header, nav, main, footer {
+      padding: 0.5rem;
+    }
+    nav ul {
+      flex-direction: column;
+    }
+  }
+  

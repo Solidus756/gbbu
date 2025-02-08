@@ -4,15 +4,18 @@
   <meta charset="UTF-8">
   <title>{% block title %}Charity Streaming{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
   <header>
     <h1>Charity Streaming</h1>
     <nav>
       <ul>
-        <li><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'accounts:login' %}">Connexion</a></li>
-        <li><a href="{% url 'twitch:twitch_wall' %}">Twitch Wall</a></li>
+        <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Accueil</a></li>
+        <li><a href="{% url 'accounts:dashboard' %}"><i class="fas fa-user"></i> Dashboard</a></li>
+        <li><a href="{% url 'accounts:login' %}"><i class="fas fa-sign-in-alt"></i> Connexion</a></li>
+        <li><a href="{% url 'twitch:twitch_wall' %}"><i class="fas fa-tv"></i> Twitch Wall</a></li>
       </ul>
     </nav>
   </header>
