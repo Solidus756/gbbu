@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from charity_streaming.views import home
 
 urlpatterns = [
-    path('', views.home, name='home'),  # Route pour la racine
+    path('', home, name='home'),  # Route pour la racine
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('twitch/', include('twitch.urls')),
