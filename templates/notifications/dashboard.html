@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Notifications{% endblock %}
+{% block content %}
+  <h2>Vos Notifications</h2>
+  <ul>
+    {% for notification in notifications %}
+      <li>
+        <strong>{{ notification.title }}</strong> - {{ notification.message }}
+        {% if not notification.is_read %}
+          <a href="{% url 'notifications:mark_notification_as_read' notification.id %}">Marquer comme lue</a>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>Aucune notification.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Charity Streaming{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header>
+    <h1>Charity Streaming</h1>
+    <nav>
+      <ul>
+        <li><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'accounts:login' %}">Connexion</a></li>
+        <li><a href="{% url 'twitch:twitch_wall' %}">Twitch Wall</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+  </main>
+  <footer>
+    <p>&copy; 2025 Charity Streaming</p>
+  </footer>
+</body>
+</html>

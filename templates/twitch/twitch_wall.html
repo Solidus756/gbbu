@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Twitch Wall{% endblock %}
+{% block content %}
+  <h2>Twitch Wall</h2>
+  <div class="twitch-wall">
+    {% for streamer in twitch_data %}
+      <div class="streamer">
+        <h3>{{ streamer.twitch_name }}</h3>
+        <p>Status: {{ streamer.status }}</p>
+        {% if streamer.status == "Online" %}
+          <p>Viewers: {{ streamer.viewers }}</p>
+          <p>Jeu: {{ streamer.game_name }}</p>
+          <p>Titre: {{ streamer.title }}</p>
+          <img src="{{ streamer.thumbnail }}" alt="{{ streamer.twitch_name }}">
+        {% else %}
+          <img src="{{ streamer.thumbnail }}" alt="Offline">
+        {% endif %}
+      </div>
+    {% empty %}
+      <p>Aucun streamer à afficher.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

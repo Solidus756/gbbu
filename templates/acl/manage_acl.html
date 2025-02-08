@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Gestion des ACL{% endblock %}
+{% block content %}
+  <h2>Gestion des ACL</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Groupe</th>
+        <th>Utilisateur</th>
+        <th>Ressource</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rule in acl_rules %}
+        <tr>
+          <td>{{ rule.group }}</td>
+          <td>{{ rule.user }}</td>
+          <td>{{ rule.get_resource_display }}</td>
+          <td>{{ rule.get_action_display }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">Aucune règle définie.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
