@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('', views.home, name='home'),  # Route pour la racine
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('twitch/', include('twitch.urls')),
