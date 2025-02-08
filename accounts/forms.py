@@ -6,7 +6,7 @@ class StreamerForm(forms.ModelForm):
     class Meta:
         model = Streamer
         fields = ['twitch_name', 'email', 'description', 'presence_mode', 'discord', 'profile_image_url']
-        
+    
     def clean_twitch_name(self):
         tw_name = self.cleaned_data.get('twitch_name')
         qs = Streamer.objects.filter(twitch_name=tw_name)
@@ -21,7 +21,6 @@ class StaffForm(forms.ModelForm):
         model = Staff
         fields = ['first_name', 'last_name', 'email']
 
-# Formulaire pour éditer le profil d'un utilisateur (streamer par exemple)
 class UserProfileForm(forms.ModelForm):
     tags = forms.CharField(required=False, help_text="Séparez les tags par une virgule. Les nouveaux tags seront créés automatiquement.")
     

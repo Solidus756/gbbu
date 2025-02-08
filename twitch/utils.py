@@ -3,9 +3,6 @@ from django.core.cache import cache
 from django.conf import settings
 
 def get_twitch_token():
-    """
-    Récupère le token OAuth2 via client_credentials et le met en cache pour une durée égale à son expiration.
-    """
     token = cache.get('twitch_token')
     if token:
         return token

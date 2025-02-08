@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 PRESENCE_CHOICES = [
     ("PR", "Présentiel"),
@@ -18,7 +17,7 @@ class UserProfile(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     
     def __str__(self):
-        return f"Profile de {self.user.username}"
+        return f"Profil de {self.user.username}"
 
 class Streamer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='streamer_profile')
@@ -41,7 +40,6 @@ class Staff(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
-    # Vous pouvez ajouter d'autres champs spécifiques au staff ici
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import Group, User
 
-# Exemple de ressources et actions – vous pouvez les étendre
 RESOURCES = [
     ('twitch_wall', 'Twitch Wall'),
     ('smtp_config', 'Configuration SMTP'),

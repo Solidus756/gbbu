@@ -9,7 +9,6 @@ urlpatterns = [
     path('twitch/', include('twitch.urls')),
     path('notifications/', include('notifications.urls')),
     path('acl/', include('acl.urls')),
-    # Vous pouvez ajouter d'autres routes ici si nécessaire
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

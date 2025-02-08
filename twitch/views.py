@@ -1,13 +1,10 @@
 from django.shortcuts import render
 from accounts.models import Streamer
-
+from django.conf import settings
 from .utils import get_twitch_token
 import requests
 
 def twitch_wall(request):
-    """
-    Vue publique qui affiche la liste des streamers validés avec leur statut Twitch.
-    """
     token = get_twitch_token()
     twitch_data = []
     streamers = Streamer.objects.filter(validated_by_admin=True).order_by('twitch_name')

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from .forms import StreamerForm, StaffForm, UserProfileForm
@@ -12,8 +12,7 @@ def register_streamer(request):
         if form.is_valid():
             streamer = form.save(commit=False)
             streamer.save()
-            # Le signal dans signals.py créera automatiquement le User associé si besoin
-            # Ajout dans le groupe "Streamer"
+            # Le signal va créer automatiquement l'utilisateur associé si nécessaire.
             if streamer.user:
                 streamer.user.groups.add(Group.objects.get(name="Streamer"))
             messages.success(request, "Inscription streamer réussie.")
@@ -43,7 +42,6 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            # Redirection selon rôle (exemple simple)
             if user.is_superuser or user.groups.filter(name__in=["Admin", "Staff"]).exists():
                 return redirect('/admin/')
             return redirect('accounts:dashboard')
@@ -59,13 +57,11 @@ def user_dashboard(request):
 
 @login_required
 def profile_edit(request):
-    # Pour simplifier, on édite uniquement le UserProfile (créé automatiquement par signal)
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=profile)
         if form.is_valid():
             tag_names = form.cleaned_data['tags']
-            # Clear existing tags et ajouter ceux saisis
             profile.tags.clear()
             for tag_name in tag_names:
                 tag, _ = Tag.objects.get_or_create(name=tag_name)
@@ -76,7 +72,6 @@ def profile_edit(request):
         else:
             messages.error(request, "Erreur lors de la mise à jour du profil.")
     else:
-        # Pré-remplir le champ tags avec une chaîne séparée par des virgules
         existing_tags = ", ".join([tag.name for tag in profile.tags.all()])
         form = UserProfileForm(instance=profile, initial={'tags': existing_tags})
     return render(request, "accounts/profile_edit.html", {"form": form})

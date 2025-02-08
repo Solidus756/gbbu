@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from .models import Streamer, Staff, Tag, UserProfile
-from django import forms
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -27,6 +26,3 @@ class StaffAdmin(admin.ModelAdmin):
     search_fields = ('first_name', 'last_name', 'email')
 
 admin.site.register(Staff, StaffAdmin)
-
-# Pour permettre la création de groupes et l'assignation multiple,
-# on peut utiliser l'admin standard de Django pour le modèle Group.
