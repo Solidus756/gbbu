@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Notification{% endblock %}
+
+{% block content %}
+<h2>{{ notification.title }}</h2>
+<p><strong>Reçue le :</strong> {{ notification.created_at }}</p>
+<p><strong>Message :</strong></p>
+<p>{{ notification.message }}</p>
+
+<!-- Bouton pour marquer la notification comme lue -->
+{% if not notification.is_read %}
+    <form method="post" action="{% url 'mark_notification_as_read' notification.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Marquer comme lue</button>
+    </form>
+{% else %}
+    <p class="text-muted">Cette notification a déjà été lue.</p>
+{% endif %}
+
+<a href="{% url 'notifications' %}" class="btn btn-secondary mt-3">Retour aux notifications</a>
+{% endblock %}

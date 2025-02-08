@@ -1,0 +1,23 @@
+{# main_app/templates/admin_custom/login.html #}
+{% extends "admin_custom/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-4">
+    <h2 class="mb-4">Connexion à l'Admin</h2>
+    <form method="post" action="">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_username" class="form-label">{% translate 'Username' %}</label>
+        <input type="text" name="username" autofocus class="form-control" id="id_username">
+      </div>
+      <div class="mb-3">
+        <label for="id_password" class="form-label">{% translate 'Password' %}</label>
+        <input type="password" name="password" class="form-control" id="id_password">
+      </div>
+      <button type="submit" class="btn btn-primary">{% translate 'Log in' %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

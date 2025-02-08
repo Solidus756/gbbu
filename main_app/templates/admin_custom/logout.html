@@ -1,0 +1,11 @@
+{# main_app/templates/admin_custom/logout.html #}
+{% extends "admin_custom/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>{% translate 'Logged out' %}</h2>
+  <p>{% translate "You have been successfully logged out." %}</p>
+  <a href="{% url 'myadmin:login' %}" class="btn btn-primary">{% translate 'Log in again' %}</a>
+</div>
+{% endblock %}

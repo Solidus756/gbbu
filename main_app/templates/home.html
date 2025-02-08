@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil - Charity Streaming{% endblock %}
+
+{% block content %}
+<div class="row align-items-center">
+  <div class="col-md-6">
+    <h1>Bienvenue sur Charity Streaming</h1>
+    <p>Rejoignez-nous pour des événements caritatifs en streaming, aidez-nous à récolter des fonds et découvrez de formidables créateurs de contenu !</p>
+    <a href="{% url 'register_streamer' %}" class="btn btn-primary me-2">Devenir Streamer</a>
+    <a href="{% url 'register_staff' %}" class="btn btn-outline-primary">Rejoindre le Staff</a>
+  </div>
+  <div class="col-md-6 d-none d-md-block">
+    <!-- Exemple d'image ou bannière -->
+    <img src="{% static 'images/charity_banner.jpg' %}" alt="Charity Banner" class="img-fluid rounded">
+  </div>
+</div>
+<hr class="my-4">
+
+<!-- Section "À propos" -->
+<div class="row my-4">
+  <div class="col-md-4">
+    <h2>Pourquoi nous soutenir ?</h2>
+    <p>Nous collectons des fonds pour diverses associations caritatives. Votre participation est essentielle pour offrir de la visibilité et récolter un maximum de dons.</p>
+  </div>
+  <div class="col-md-4">
+    <h2>Comment participer ?</h2>
+    <p>C’est simple : devenez streamer, faites un live, parlez de la cause, ou aidez-nous en tant que membre du staff !</p>
+  </div>
+  <div class="col-md-4">
+    <h2>Nos résultats</h2>
+    <p>Grâce à vous, nous avons déjà permis de financer plusieurs projets associatifs. Continuons sur cette lancée !</p>
+  </div>
+</div>
+{% endblock %}

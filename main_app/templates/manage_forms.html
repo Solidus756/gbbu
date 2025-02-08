@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Gestion des formulaires</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="position">Ajouter un poste staff :</label>
+    <input type="text" name="position" id="position">
+    <button type="submit">Ajouter</button>
+</form>
+
+<h3>Postes existants :</h3>
+<ul>
+    {% for position in positions %}
+        <li>{{ position.name }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

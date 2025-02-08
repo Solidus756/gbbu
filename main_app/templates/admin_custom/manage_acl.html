@@ -1,0 +1,15 @@
+<h2>Gestion des ACL</h2>
+<table>
+  <tr>
+    <th>Groupe</th>
+    <th>Ressource</th>
+    <th>Action</th>
+  </tr>
+  {% for rule in acl_rules %}
+    <tr>
+      <td>{{ rule.group.name }}</td>
+      <td>{{ rule.resource }}</td>
+      <td>{{ rule.action }}</td>
+    </tr>
+  {% endfor %}
+</table>

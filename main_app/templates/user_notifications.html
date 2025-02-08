@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<h1>Vos Notifications</h1>
+
+{% if notifications %}
+<ul class="list-group mt-3">
+    {% for notification in notifications %}
+        <li class="list-group-item notification-item" 
+            onclick="window.location.href='{% url 'view_notification' notification.id %}'"
+            style="cursor: pointer;">
+            <i class="fa-solid {{ notification.icon_class }}"></i>
+            <strong>{{ notification.title }}</strong>
+            <p class="text-muted">
+                {{ notification.message|truncatechars:100 }}  <!-- ✅ Extrait limité à 100 caractères -->
+            </p>
+            <small class="text-muted">{{ notification.created_at }}</small>
+        </li>
+    {% empty %}
+        <li class="list-group-item">Aucune notification disponible.</li>
+    {% endfor %}
+</ul>
+{% else %}
+    <p class="text-muted">Aucune notification disponible.</p>
+{% endif %}
+
+<a href="{% url 'user_dashboard' %}" class="btn btn-primary mt-4">Retour au Dashboard</a>
+{% endblock %}
