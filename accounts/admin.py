@@ -26,3 +26,9 @@ class StaffAdmin(admin.ModelAdmin):
     search_fields = ('first_name', 'last_name', 'email')
 
 admin.site.register(Staff, StaffAdmin)
+
+class BlacklistedStreamerAdmin(admin.ModelAdmin):
+    list_display = ('twitch_name',)
+    search_fields = ('twitch_name',)
+
+admin.site.register(BlacklistedStreamer, BlacklistedStreamerAdmin)
