@@ -80,59 +80,72 @@ document.addEventListener("DOMContentLoaded", function() {
   const streamerFormDiv = document.getElementById('streamerForm');
   const staffFormDiv = document.getElementById('staffForm');
   const searchBtn = document.getElementById("searchTwitchBtn");
-  const twitchNameInput = document.getElementById("id_twitch_name");
-  const descriptionField = document.getElementById("id_description");
-  const profileImageHidden = document.getElementById("id_profile_image_url");
-  const profileImagePreview = document.getElementById("profileImagePreview");
   
+  // Fonction utilitaire pour activer/désactiver les inputs dans un conteneur donné
+  function setDisabled(containerSelector, disabled) {
+    const inputs = document.querySelectorAll(containerSelector + " input, " + containerSelector + " textarea, " + containerSelector + " select");
+    inputs.forEach(el => el.disabled = disabled);
+  }
+
+  // Initialement, désactiver les deux formulaires
+  setDisabled("#streamerForm", true);
+  setDisabled("#staffForm", true);
+
   registrationSelect.addEventListener('change', function() {
     const val = registrationSelect.value;
     if(val === 'streamer'){
       streamerFormDiv.style.display = 'block';
       staffFormDiv.style.display = 'none';
+      setDisabled("#streamerForm", false);
+      setDisabled("#staffForm", true);
     } else if(val === 'staff'){
       staffFormDiv.style.display = 'block';
       streamerFormDiv.style.display = 'none';
+      setDisabled("#staffForm", false);
+      setDisabled("#streamerForm", true);
     } else {
       streamerFormDiv.style.display = 'none';
       staffFormDiv.style.display = 'none';
+      setDisabled("#streamerForm", true);
+      setDisabled("#staffForm", true);
     }
   });
 
-  searchBtn.addEventListener("click", function() {
-    const twitchName = twitchNameInput.value.trim();
-    if (!twitchName) {
-      alert("Veuillez saisir un nom Twitch.");
-      return;
-    }
-    
-    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert(data.error);
-          descriptionField.value = "";
-          profileImageHidden.value = "";
-          profileImagePreview.innerHTML = "";
-        } else {
-          // Pré-remplissage des champs
-          descriptionField.value = data.description;
-          profileImageHidden.value = data.profile_image_url;
-          profileImagePreview.innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de profil" class="img-fluid" style="max-width:200px;">';
-          // Message flash côté client (optionnel)
-          alert("Informations récupérées avec succès !");
-        }
-      })
-      .catch(error => {
-        console.error("Erreur lors de la récupération des infos Twitch :", error);
-        alert("Une erreur s'est produite, réessayez plus tard.");
-      });
-  });
+  // Gestion du bouton "Rechercher" pour le formulaire Streamer
+  if(searchBtn) {
+    searchBtn.addEventListener("click", function() {
+      const twitchNameInput = document.getElementById("id_twitch_name");
+      const descriptionField = document.getElementById("id_description");
+      const profileImageHidden = document.getElementById("id_profile_image_url");
+      const profileImagePreview = document.getElementById("profileImagePreview");
+      
+      const twitchName = twitchNameInput.value.trim();
+      if (!twitchName) {
+        alert("Veuillez saisir un nom Twitch.");
+        return;
+      }
+      
+      fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+            descriptionField.value = "";
+            profileImageHidden.value = "";
+            profileImagePreview.innerHTML = "";
+          } else {
+            descriptionField.value = data.description;
+            profileImageHidden.value = data.profile_image_url;
+            profileImagePreview.innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de profil" class="img-fluid" style="max-width:200px;">';
+            alert("Informations récupérées avec succès !");
+          }
+        })
+        .catch(error => {
+          console.error("Erreur lors de la récupération des infos Twitch :", error);
+          alert("Une erreur s'est produite, réessayez plus tard.");
+        });
+    });
+  }
 });
-
-document.getElementById("registrationForm").addEventListener("submit", function(e) {
-  console.log("Le formulaire a été soumis !");
-});
-
 </script>
 {% endblock %}
