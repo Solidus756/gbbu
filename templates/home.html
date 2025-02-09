@@ -1,7 +1,75 @@
-<!-- templates/home.html -->
 {% extends "base.html" %}
 {% block title %}Accueil{% endblock %}
 {% block content %}
+<div class="container">
   <h2>Bienvenue sur Charity Streaming</h2>
   <p>Ceci est la page d'accueil de votre site.</p>
+  <!-- Bouton pour ouvrir le modal d'inscription -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registrationModal">
+    Rejoindre l'aventure
+  </button>
+</div>
+
+<!-- Modal d'inscription -->
+<div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="registrationForm" method="post" action="{% url 'accounts:public_registration' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="registrationModalLabel">Inscription</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Menu déroulant pour choisir le type d'inscription -->
+          <div class="form-group">
+            <label for="registration_type">Choisissez votre type d'inscription</label>
+            <select class="form-control" id="registration_type" name="registration_type">
+              <option value="">-- Sélectionnez --</option>
+              <option value="streamer">Streamer</option>
+              <option value="staff">Staff</option>
+            </select>
+          </div>
+          <!-- Formulaire Streamer -->
+          <div id="streamerForm" style="display: none;">
+            <h5>Inscription Streamer</h5>
+            {{ streamer_form.as_p }}
+          </div>
+          <!-- Formulaire Staff -->
+          <div id="staffForm" style="display: none;">
+            <h5>Inscription Staff</h5>
+            {{ staff_form.as_p }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+  $(document).ready(function(){
+    $('#registration_type').on('change', function(){
+      var val = $(this).val();
+      if(val === 'streamer'){
+        $('#streamerForm').show();
+        $('#staffForm').hide();
+      } else if(val === 'staff'){
+        $('#staffForm').show();
+        $('#streamerForm').hide();
+      } else {
+        $('#streamerForm').hide();
+        $('#staffForm').hide();
+      }
+    });
+  });
+</script>
 {% endblock %}

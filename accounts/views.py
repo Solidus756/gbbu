@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
@@ -75,3 +77,56 @@ def profile_edit(request):
         existing_tags = ", ".join([tag.name for tag in profile.tags.all()])
         form = UserProfileForm(instance=profile, initial={'tags': existing_tags})
     return render(request, "accounts/profile_edit.html", {"form": form})
+
+def public_registration(request):
+    """
+    Vue de traitement de l'inscription publique via un formulaire unique.
+    Le formulaire comprend un menu déroulant qui permet de choisir entre
+    l'inscription de Streamer ou de Staff.
+    """
+    if request.method == "POST":
+        registration_type = request.POST.get("registration_type")
+        if registration_type == "streamer":
+            form = StreamerForm(request.POST)
+            if form.is_valid():
+                streamer = form.save(commit=False)
+                streamer.save()
+                # (Le signal va créer le User associé si nécessaire)
+                # Envoi d'un email de confirmation à l'utilisateur
+                send_mail(
+                    "Demande d'inscription reçue",
+                    f"Bonjour {streamer.twitch_name},\n\nVotre demande d'inscription en tant que streamer a bien été reçue. Vous recevrez un email de confirmation dès qu'un organisateur aura validé votre inscription.",
+                    "no-reply@charitystreaming.com",
+                    [streamer.email],
+                )
+                messages.success(request, "Votre demande d'inscription a été envoyée. Vous recevrez un email de confirmation une fois validée par un organisateur.")
+                return redirect("home")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs dans le formulaire Streamer.")
+        elif registration_type == "staff":
+            form = StaffForm(request.POST)
+            if form.is_valid():
+                staff = form.save(commit=False)
+                staff.save()
+                send_mail(
+                    "Demande d'inscription reçue",
+                    f"Bonjour {staff.first_name},\n\nVotre demande d'inscription en tant que staff a bien été reçue. Vous recevrez un email de confirmation dès qu'un organisateur aura validé votre inscription.",
+                    "no-reply@charitystreaming.com",
+                    [staff.email],
+                )
+                messages.success(request, "Votre demande d'inscription a été envoyée. Vous recevrez un email de confirmation une fois validée par un organisateur.")
+                return redirect("home")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs dans le formulaire Staff.")
+        else:
+            messages.error(request, "Veuillez choisir un type d'inscription.")
+        # Si le formulaire n'est pas valide, on va réafficher la page avec les formulaires pré-remplis
+        streamer_form = StreamerForm(request.POST) if registration_type == "streamer" else StreamerForm()
+        staff_form = StaffForm(request.POST) if registration_type == "staff" else StaffForm()
+    else:
+        streamer_form = StreamerForm()
+        staff_form = StaffForm()
+    return render(request, "accounts/public_registration.html", {
+        'streamer_form': streamer_form,
+        'staff_form': staff_form,
+    })
