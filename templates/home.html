@@ -1,32 +1,30 @@
 {% extends "base.html" %}
 {% block title %}Accueil{% endblock %}
 {% block content %}
-<div class="container">
+<div class="container text-center">
   <h2>Bienvenue sur Charity Streaming</h2>
   <p>Ceci est la page d'accueil de votre site.</p>
   <!-- Bouton pour ouvrir le modal d'inscription -->
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registrationModal">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registrationModal">
     Rejoindre l'aventure
   </button>
 </div>
 
-<!-- Modal d'inscription -->
-<div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+<!-- Modal d'inscription Bootstrap 5 -->
+<div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
       <form id="registrationForm" method="post" action="{% url 'accounts:public_registration' %}">
         {% csrf_token %}
         <div class="modal-header">
           <h5 class="modal-title" id="registrationModalLabel">Inscription</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
           <!-- Menu déroulant pour choisir le type d'inscription -->
-          <div class="form-group">
-            <label for="registration_type">Choisissez votre type d'inscription</label>
-            <select class="form-control" id="registration_type" name="registration_type">
+          <div class="mb-3">
+            <label for="registration_type" class="form-label">Choisissez votre type d'inscription</label>
+            <select class="form-select" id="registration_type" name="registration_type">
               <option value="">-- Sélectionnez --</option>
               <option value="streamer">Streamer</option>
               <option value="staff">Staff</option>
@@ -44,7 +42,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
           <button type="submit" class="btn btn-primary">Envoyer</button>
         </div>
       </form>
@@ -54,23 +52,24 @@
 {% endblock %}
 
 {% block extra_js %}
-<script
-			  src="https://code.jquery.com/jquery-3.7.1.min.js"
-			  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-			  crossorigin="anonymous"></script>
 <script>
-  $(document).ready(function(){
-    $('#registration_type').on('change', function(){
-      var val = $(this).val();
-      if(val === 'streamer'){
-        $('#streamerForm').show();
-        $('#staffForm').hide();
-      } else if(val === 'staff'){
-        $('#staffForm').show();
-        $('#streamerForm').hide();
+  document.addEventListener("DOMContentLoaded", function() {
+    const registrationSelect = document.getElementById('registration_type');
+    const streamerFormDiv = document.getElementById('streamerForm');
+    const staffFormDiv = document.getElementById('staffForm');
+    
+    registrationSelect.addEventListener('change', function() {
+      const val = registrationSelect.value;
+      console.log("Valeur sélectionnée :", val);
+      if (val === 'streamer') {
+        streamerFormDiv.style.display = 'block';
+        staffFormDiv.style.display = 'none';
+      } else if (val === 'staff') {
+        staffFormDiv.style.display = 'block';
+        streamerFormDiv.style.display = 'none';
       } else {
-        $('#streamerForm').hide();
-        $('#staffForm').hide();
+        streamerFormDiv.style.display = 'none';
+        staffFormDiv.style.display = 'none';
       }
     });
   });
