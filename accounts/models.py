@@ -43,3 +43,9 @@ class Staff(models.Model):
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+class BlacklistedStreamer(models.Model):
+    twitch_name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.twitch_name

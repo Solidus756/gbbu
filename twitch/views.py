@@ -1,8 +1,10 @@
+import requests
+
 from django.shortcuts import render
-from accounts.models import Streamer
+from django.http import JsonResponse
+from accounts.models import Streamer, BlacklistedStreamer
 from django.conf import settings
 from .utils import get_twitch_token
-import requests
 
 def twitch_wall(request):
     token = get_twitch_token()
@@ -43,3 +45,43 @@ def twitch_wall(request):
                 'thumbnail': '/static/images/error.png',
             })
     return render(request, 'twitch/twitch_wall.html', {'twitch_data': twitch_data})
+
+def ajax_fetch_streamer_info(request):
+    twitch_name = request.GET.get('twitch_name', '').strip()
+    if not twitch_name:
+        return JsonResponse({'error': 'Aucun nom Twitch fourni.'}, status=400)
+    
+    normalized_name = twitch_name.lower()
+    
+    # Vérifier si le streamer est déjà enregistré (insensible à la casse)
+    if Streamer.objects.filter(twitch_name__iexact=normalized_name).exists():
+        return JsonResponse({'error': 'Ce streamer est déjà enregistré.'}, status=400)
+    
+    # Vérifier si le nom est dans la blacklist
+    if BlacklistedStreamer.objects.filter(twitch_name__iexact=normalized_name).exists():
+        return JsonResponse({'error': "Une erreur s'est produite, réessayez plus tard."}, status=400)
+    
+    token = get_twitch_token()
+    if not token:
+        return JsonResponse({'error': "Impossible de récupérer le token Twitch."}, status=500)
+    
+    headers = {
+        'Client-ID': settings.TWITCH_CLIENT_ID,
+        'Authorization': f'Bearer {token}',
+    }
+    url = f"https://api.twitch.tv/helix/users?login={normalized_name}"
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json().get('data', [])
+        if data:
+            user_info = data[0]
+            description = user_info.get('description', '')
+            profile_image_url = user_info.get('profile_image_url', '')
+            return JsonResponse({
+                'description': description,
+                'profile_image_url': profile_image_url,
+            })
+        else:
+            return JsonResponse({'error': "Aucune information trouvée pour ce nom."}, status=404)
+    else:
+        return JsonResponse({'error': "Erreur lors de la récupération des informations."}, status=500)

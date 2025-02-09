@@ -2,18 +2,24 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Streamer, Staff, Tag, UserProfile
 
+
 class StreamerForm(forms.ModelForm):
     class Meta:
         model = Streamer
-        fields = ['twitch_name', 'email', 'description', 'presence_mode', 'discord', 'profile_image_url']
+        fields = ['twitch_name', 'email', 'description', 'discord', 'profile_image_url']
+        widgets = {
+            'profile_image_url': forms.HiddenInput(),
+        }
     
     def clean_twitch_name(self):
-        tw_name = self.cleaned_data.get('twitch_name')
-        qs = Streamer.objects.filter(twitch_name=tw_name)
+        tw_name = self.cleaned_data.get('twitch_name', '').strip()
+        # Vérification insensible à la casse pour éviter les doublons
         if self.instance.pk:
-            qs = qs.exclude(pk=self.instance.pk)
+            qs = Streamer.objects.filter(twitch_name__iexact=tw_name).exclude(pk=self.instance.pk)
+        else:
+            qs = Streamer.objects.filter(twitch_name__iexact=tw_name)
         if qs.exists():
-            raise forms.ValidationError("Ce nom Twitch est déjà pris. Veuillez en choisir un autre.")
+            raise forms.ValidationError("Ce streamer est déjà enregistré.")
         return tw_name
 
 class StaffForm(forms.ModelForm):
