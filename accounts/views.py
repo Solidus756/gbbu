@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
-from .forms import StreamerForm, StaffForm, UserProfileForm, SocialAccountFormSet
+from .forms import StreamerForm, StaffApplicationForm, UserProfileForm, SocialAccountFormSet
 from .models import Streamer, Staff, UserProfile, Tag
 
 def register_streamer(request):
@@ -100,17 +100,17 @@ def public_registration(request):
                 return redirect("home")
             else:
                 messages.error(request, "Veuillez corriger les erreurs dans le formulaire Streamer.")
-                staff_form = StaffForm()
+                staff_form = StaffApplicationForm()  # pour recharger l'autre formulaire
         elif registration_type == "staff":
-            staff_form = StaffForm(request.POST)
+            staff_form = StaffApplicationForm(request.POST)
             if staff_form.is_valid():
-                staff = staff_form.save(commit=False)
-                staff.save()
+                staff_application = staff_form.save(commit=False)
+                staff_application.save()
                 send_mail(
                     "Demande d'inscription reçue",
-                    f"Bonjour {staff.first_name},\n\nVotre demande d'inscription en tant que staff a bien été reçue. Vous recevrez un email de confirmation dès qu'un organisateur aura validé votre inscription.",
+                    f"Bonjour {staff_application.pseudo},\n\nVotre demande d'inscription en tant que staff a bien été reçue. Vous recevrez un email de confirmation dès qu'un organisateur aura validé votre inscription.",
                     "no-reply@charitystreaming.com",
-                    [staff.email],
+                    [staff_application.email],
                 )
                 messages.success(request, "Votre demande d'inscription a été envoyée.")
                 return redirect("home")
@@ -121,11 +121,11 @@ def public_registration(request):
         else:
             messages.error(request, "Veuillez choisir un type d'inscription.")
             streamer_form = StreamerForm()
-            staff_form = StaffForm()
+            staff_form = StaffApplicationForm()
             social_formset = SocialAccountFormSet(prefix="socialaccount_set")
     else:
         streamer_form = StreamerForm()
-        staff_form = StaffForm()
+        staff_form = StaffApplicationForm()
         social_formset = SocialAccountFormSet(prefix="socialaccount_set")
     return render(request, "accounts/public_registration.html", {
         'streamer_form': streamer_form,

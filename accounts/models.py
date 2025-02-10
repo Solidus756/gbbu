@@ -82,3 +82,48 @@ class SocialAccount(models.Model):
 
     def __str__(self):
         return f"{self.network.capitalize()} - {self.username}"
+    
+class StaffPosition(models.Model):
+    poste = models.CharField(max_length=100)
+    mode = models.CharField(max_length=2, choices=PRESENCE_CHOICES)  # "PR" pour Présentiel, "DI" pour Distanciel
+    nombre_de_postes = models.PositiveIntegerField(default=1)
+    
+    def __str__(self):
+        return f"{self.poste} ({self.get_mode_display()}) - {self.nombre_de_postes} requis"
+
+STATUS_CHOICES = [
+    ('candidature', 'Candidature'),
+    ('staff', 'Staff effectif'),
+    ('reserve', 'Réserve'),
+]
+
+class StaffApplication(models.Model):
+    pseudo = models.CharField(max_length=150)
+    pseudo_discord = models.CharField(max_length=150, blank=True)
+    pseudo_twitch = models.CharField(max_length=150, blank=True)
+    email = models.EmailField()
+    poste_demande = models.ForeignKey(StaffPosition, on_delete=models.CASCADE, related_name="applications")
+    pourquoi = models.TextField(verbose_name="Pourquoi je veux rejoindre le staff")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="candidature")
+    created_at = models.DateTimeField(auto_now_add=True)
+    # Optionnel : liaison avec Streamer si le pseudo correspond
+    streamer = models.ForeignKey(Streamer, on_delete=models.SET_NULL, null=True, blank=True, related_name="staff_applications")
+    # Pour stocker les tags associés à la candidature
+    tags = models.ManyToManyField(Tag, blank=True)
+    
+    def __str__(self):
+        return f"{self.pseudo} - {self.poste_demande}"
+
+    def postes_disponibles(self):
+        """
+        Retourne le nombre de postes disponibles pour le poste demandé.
+        Calculé comme : nombre_de_postes requis - nombre de candidatures validées pour ce poste.
+        """
+        validated_count = StaffApplication.objects.filter(poste_demande=self.poste_demande, status='staff').count()
+        return max(self.poste_demande.nombre_de_postes - validated_count, 0)
+        
+    def nombre_reserve(self):
+        """
+        Retourne le nombre de candidatures en réserve pour ce poste.
+        """
+        return StaffApplication.objects.filter(poste_demande=self.poste_demande, status='reserve').count()

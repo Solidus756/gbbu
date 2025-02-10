@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
-from .models import Streamer, Staff, Tag, UserProfile,  BlacklistedStreamer
+from .models import Streamer, Staff, Tag, UserProfile,  BlacklistedStreamer, StaffPosition, StaffApplication
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -21,14 +21,23 @@ class StreamerAdmin(admin.ModelAdmin):
 
 admin.site.register(Streamer, StreamerAdmin)
 
-class StaffAdmin(admin.ModelAdmin):
-    list_display = ('user', 'first_name', 'last_name', 'email')
-    search_fields = ('first_name', 'last_name', 'email')
-
-admin.site.register(Staff, StaffAdmin)
-
 class BlacklistedStreamerAdmin(admin.ModelAdmin):
     list_display = ('twitch_name',)
     search_fields = ('twitch_name',)
 
 admin.site.register(BlacklistedStreamer, BlacklistedStreamerAdmin)
+
+class StaffPositionAdmin(admin.ModelAdmin):
+    list_display = ('poste', 'mode', 'nombre_de_postes')
+    list_filter = ('mode',)
+    search_fields = ('poste',)
+
+admin.site.register(StaffPosition, StaffPositionAdmin)
+
+class StaffApplicationAdmin(admin.ModelAdmin):
+    list_display = ('pseudo', 'poste_demande', 'status', 'created_at', 'postes_disponibles', 'nombre_reserve')
+    list_filter = ('status', 'poste_demande')
+    search_fields = ('pseudo', 'email')
+    
+    # Vous pouvez ajouter ici des actions personnalisées si besoin
+admin.site.register(StaffApplication, StaffApplicationAdmin)

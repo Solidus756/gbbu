@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.crypto import get_random_string
-from .models import Streamer, UserProfile
+from .models import Streamer, UserProfile, StaffApplication, Tag, StaffPosition
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -40,3 +40,21 @@ def send_validation_email(sender, instance, **kwargs):
             "Merci et bienvenue !"
         )
         send_mail(subject, message, "no-reply@charitystreaming.com", [instance.email])
+
+@receiver(post_save, sender=StaffApplication)
+def add_tags_to_staff_application(sender, instance, created, **kwargs):
+    # Ne traiter que si la candidature existe déjà (créée) et son statut a été modifié par l'admin
+    if not created:
+        # Pour les candidatures validées en "staff"
+        if instance.status == 'staff':
+            # Ajouter le tag "Staff"
+            tag_staff, _ = Tag.objects.get_or_create(name="Staff")
+            instance.tags.add(tag_staff)
+            # Ajouter le tag correspondant au poste (utiliser le champ poste_demande.poste)
+            tag_poste, _ = Tag.objects.get_or_create(name=instance.poste_demande.poste)
+            instance.tags.add(tag_poste)
+        elif instance.status == 'reserve':
+            # Ajouter un tag de type "réserve-<nom du poste>"
+            tag_reserve_name = f"réserve-{instance.poste_demande.poste}"
+            tag_reserve, _ = Tag.objects.get_or_create(name=tag_reserve_name)
+            instance.tags.add(tag_reserve)

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import inlineformset_factory
-from .models import Streamer, Staff, Tag, UserProfile, SocialAccount
+from .models import Streamer, Tag, UserProfile, SocialAccount, StaffApplication, StaffPosition
 
 
 class StreamerForm(forms.ModelForm):
@@ -24,10 +24,19 @@ class StreamerForm(forms.ModelForm):
             raise forms.ValidationError("Ce streamer est déjà enregistré.")
         return tw_name
 
-class StaffForm(forms.ModelForm):
+class StaffApplicationForm(forms.ModelForm):
     class Meta:
-        model = Staff
-        fields = ['first_name', 'last_name', 'email']
+        model = StaffApplication
+        fields = ['pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi']
+        widgets = {
+            'pseudo': forms.TextInput(attrs={'class': 'form-control'}),
+            'pseudo_discord': forms.TextInput(attrs={'class': 'form-control'}),
+            'pseudo_twitch': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'poste_demande': forms.Select(attrs={'class': 'form-control'}),
+            'pourquoi': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+
 
 class UserProfileForm(forms.ModelForm):
     tags = forms.CharField(required=False, help_text="Séparez les tags par une virgule. Les nouveaux tags seront créés automatiquement.")
