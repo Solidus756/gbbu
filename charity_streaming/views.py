@@ -1,6 +1,6 @@
 # charity_streaming/views.py
 from django.shortcuts import render
-from accounts.forms import StreamerForm, StaffForm, SocialAccountFormSet
+from accounts.forms import StreamerForm, StaffApplicationForm, SocialAccountFormSet
 
 def home(request):
     streamer_form = StreamerForm()
