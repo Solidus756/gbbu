@@ -133,7 +133,7 @@ def public_registration(request):
         'staff_form': staff_form,
         'social_formset': social_formset,
     })
-
+'''
 def home(request):
     streamer_form = StreamerForm()
     staff_form = StaffApplicationForm()
@@ -143,3 +143,4 @@ def home(request):
         'staff_form': staff_form,
         'social_formset': social_formset,
     })
+'''

@@ -4,7 +4,7 @@ from accounts.forms import StreamerForm, StaffForm, SocialAccountFormSet
 
 def home(request):
     streamer_form = StreamerForm()
-    staff_form = StaffForm()
+    staff_form = StaffApplicationForm()
     social_formset = SocialAccountFormSet(prefix="socialaccount_set")
     return render(request, 'home.html', {
         'streamer_form': streamer_form,
