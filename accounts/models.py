@@ -49,3 +49,36 @@ class BlacklistedStreamer(models.Model):
 
     def __str__(self):
         return self.twitch_name
+    
+SOCIAL_NETWORK_CHOICES = [
+    ("twitter", "Twitter"),
+    ("youtube", "YouTube"),
+    ("instagram", "Instagram"),
+    ("facebook", "Facebook"),
+    ("tiktok", "TikTok"),
+]
+
+class SocialAccount(models.Model):
+    streamer = models.ForeignKey(
+        Streamer, on_delete=models.CASCADE, related_name='social_accounts'
+    )
+    network = models.CharField(max_length=20, choices=SOCIAL_NETWORK_CHOICES)
+    username = models.CharField(max_length=100)
+    url = models.URLField(blank=True)
+
+    def save(self, *args, **kwargs):
+        # Génération automatique de l'URL selon le réseau sélectionné
+        if self.network == "twitter":
+            self.url = f"https://twitter.com/{self.username}"
+        elif self.network == "youtube":
+            self.url = f"https://youtube.com/@{self.username}"
+        elif self.network == "instagram":
+            self.url = f"https://instagram.com/{self.username}"
+        elif self.network == "facebook":
+            self.url = f"https://facebook.com/{self.username}"
+        elif self.network == "tiktok":
+            self.url = f"https://www.tiktok.com/@{self.username}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.network.capitalize()} - {self.username}"
