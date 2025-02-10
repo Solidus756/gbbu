@@ -127,3 +127,9 @@ class StaffApplication(models.Model):
         Retourne le nombre de candidatures en réserve pour ce poste.
         """
         return StaffApplication.objects.filter(poste_demande=self.poste_demande, status='reserve').count()
+    def get_tags_display(self):
+        """
+        Retourne une chaîne avec les noms des tags associés, séparés par des virgules.
+        """
+        return ", ".join([tag.name for tag in self.tags.all()])
+    get_tags_display.short_description = "Tags"

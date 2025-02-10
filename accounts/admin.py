@@ -35,7 +35,7 @@ class StaffPositionAdmin(admin.ModelAdmin):
 admin.site.register(StaffPosition, StaffPositionAdmin)
 
 class StaffApplicationAdmin(admin.ModelAdmin):
-    list_display = ('pseudo', 'poste_demande', 'status', 'created_at', 'postes_disponibles', 'nombre_reserve')
+    list_display = ('pseudo', 'poste_demande', 'status', 'created_at', 'postes_disponibles', 'nombre_reserve', 'get_tags_display')
     list_filter = ('status', 'poste_demande')
     search_fields = ('pseudo', 'email')
     
