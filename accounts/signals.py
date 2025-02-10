@@ -43,18 +43,22 @@ def send_validation_email(sender, instance, **kwargs):
 
 @receiver(post_save, sender=StaffApplication)
 def add_tags_to_staff_application(sender, instance, created, **kwargs):
-    # Ne traiter que si la candidature existe déjà (créée) et son statut a été modifié par l'admin
-    if not created:
-        # Pour les candidatures validées en "staff"
-        if instance.status == 'staff':
-            # Ajouter le tag "Staff"
-            tag_staff, _ = Tag.objects.get_or_create(name="Staff")
-            instance.tags.add(tag_staff)
-            # Ajouter le tag correspondant au poste (utiliser le champ poste_demande.poste)
-            tag_poste, _ = Tag.objects.get_or_create(name=instance.poste_demande.poste)
-            instance.tags.add(tag_poste)
-        elif instance.status == 'reserve':
-            # Ajouter un tag de type "réserve-<nom du poste>"
-            tag_reserve_name = f"réserve-{instance.poste_demande.poste}"
-            tag_reserve, _ = Tag.objects.get_or_create(name=tag_reserve_name)
-            instance.tags.add(tag_reserve)
+    """
+    Ajoute automatiquement les tags suivants lorsque le statut d'une candidature est mis à jour :
+    - Si le status est "staff", on ajoute le tag "Staff" et un tag correspondant au poste demandé.
+    - Si le status est "reserve", on ajoute un tag au format "réserve-<poste>".
+    Cette opération s'exécute après la sauvegarde et n'enlève aucun tag existant.
+    """
+    # On ajoute toujours les tags si le status est 'staff' ou 'reserve'
+    if instance.status == 'staff':
+        # Tag "Staff"
+        tag_staff, _ = Tag.objects.get_or_create(name="Staff")
+        instance.tags.add(tag_staff)
+        # Tag correspondant au poste demandé
+        tag_poste, _ = Tag.objects.get_or_create(name=instance.poste_demande.poste)
+        instance.tags.add(tag_poste)
+    elif instance.status == 'reserve':
+        # Tag pour la réserve
+        tag_reserve_name = f"réserve-{instance.poste_demande.poste}"
+        tag_reserve, _ = Tag.objects.get_or_create(name=tag_reserve_name)
+        instance.tags.add(tag_reserve)
