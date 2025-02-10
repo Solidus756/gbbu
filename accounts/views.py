@@ -23,6 +23,7 @@ def register_streamer(request):
         form = StreamerForm()
     return render(request, "accounts/register_streamer.html", {"form": form})
 
+'''
 def register_staff(request):
     if request.method == "POST":
         form = StaffForm(request.POST)
@@ -36,7 +37,7 @@ def register_staff(request):
     else:
         form = StaffForm()
     return render(request, "accounts/register_staff.html", {"form": form})
-
+'''
 def user_login(request):
     if request.method == "POST":
         username = request.POST.get('username')
