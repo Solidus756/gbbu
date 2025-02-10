@@ -7,9 +7,10 @@ from .models import Streamer, Staff, Tag, UserProfile, SocialAccount
 class StreamerForm(forms.ModelForm):
     class Meta:
         model = Streamer
-        fields = ['twitch_name', 'email', 'description', 'discord', 'profile_image_url']
+        fields = ['twitch_name', 'email', 'description', 'discord', 'profile_image_url', 'presence_mode']
         widgets = {
             'profile_image_url': forms.HiddenInput(),
+            'presence_mode': forms.Select(attrs={'class': 'form-control'}),
         }
     
     def clean_twitch_name(self):
