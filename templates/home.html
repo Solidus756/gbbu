@@ -49,6 +49,10 @@
                 <div id="profileImagePreview"></div>
               </div>
               <div class="mb-3">
+                <label for="{{ streamer_form.presence_mode.id_for_label }}">Type de présence</label>
+                {{ streamer_form.presence_mode }}
+              </div>
+              <div class="mb-3">
                 <label for="id_email" class="form-label">Adresse email</label>
                 {{ streamer_form.email }}
               </div>
