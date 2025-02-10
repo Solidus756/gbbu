@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from .forms import StreamerForm, StaffApplicationForm, UserProfileForm, SocialAccountFormSet
-from .models import Streamer, Staff, UserProfile, Tag
+from .models import Streamer, UserProfile, Tag
 
 def register_streamer(request):
     if request.method == "POST":
