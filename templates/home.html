@@ -11,66 +11,81 @@
 
 <!-- Modal d'inscription -->
 <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form id="registrationForm" method="post" action="{% url 'accounts:public_registration' %}">
-        {% csrf_token %}
-        <div class="modal-header">
-          <h5 class="modal-title" id="registrationModalLabel">Inscription</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Menu déroulant pour choisir le type d'inscription -->
-          <div class="mb-3">
-            <label for="registration_type" class="form-label">Choisissez votre type d'inscription</label>
-            <select class="form-select" id="registration_type" name="registration_type">
-              <option value="">-- Sélectionnez --</option>
-              <option value="streamer">Streamer</option>
-              <option value="staff">Staff</option>
-            </select>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="registrationForm" method="post" action="{% url 'accounts:public_registration' %}">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="registrationModalLabel">Inscription</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
           </div>
-          <!-- Formulaire Streamer -->
-          <div id="streamerForm" style="display: none;">
-            <h5>Inscription Streamer</h5>
+          <div class="modal-body">
+            <!-- Menu déroulant pour choisir le type d'inscription -->
             <div class="mb-3">
-              <label for="id_twitch_name" class="form-label">Twitch Name</label>
-              <div class="input-group">
-                {{ streamer_form.twitch_name }}
-                <button type="button" id="searchTwitchBtn" class="btn btn-secondary">Rechercher</button>
+              <label for="registration_type" class="form-label">Choisissez votre type d'inscription</label>
+              <select class="form-select" id="registration_type" name="registration_type">
+                <option value="">-- Sélectionnez --</option>
+                <option value="streamer">Streamer</option>
+                <option value="staff">Staff</option>
+              </select>
+            </div>
+            <!-- Formulaire Streamer -->
+            <div id="streamerForm" style="display: none;">
+              <h5>Inscription Streamer</h5>
+              <div class="mb-3">
+                <label for="id_twitch_name" class="form-label">Twitch Name</label>
+                <div class="input-group">
+                  {{ streamer_form.twitch_name }}
+                  <button type="button" id="searchTwitchBtn" class="btn btn-secondary">Rechercher</button>
+                </div>
               </div>
+              <div class="mb-3">
+                <label for="id_description" class="form-label">Description</label>
+                {{ streamer_form.description }}
+              </div>
+              {{ streamer_form.profile_image_url }} {# Champ caché #}
+              <div class="mb-3">
+                <label class="form-label">Aperçu de l'image de profil</label>
+                <div id="profileImagePreview"></div>
+              </div>
+              <div class="mb-3">
+                <label for="id_email" class="form-label">Adresse email</label>
+                {{ streamer_form.email }}
+              </div>
+              <div class="mb-3">
+                <label for="id_discord" class="form-label">Discord</label>
+                {{ streamer_form.discord }}
+              </div>
+              <!-- Section pour ajouter les réseaux sociaux -->
+              <div id="social-accounts-container">
+                <h5>Réseaux Sociaux</h5>
+                {{ social_formset.management_form }}
+                {% for form in social_formset %}
+                  <div class="social-account-form mb-2">
+                    {{ form.as_p }}
+                  </div>
+                {% endfor %}
+              </div>
+              <!-- Template caché pour ajouter un nouveau formulaire -->
+              <div id="empty-form-template" style="display: none;">
+                {{ social_formset.empty_form.as_p }}
+              </div>
+              <button type="button" id="addSocialBtn" class="btn btn-secondary">+</button>
             </div>
-            <div class="mb-3">
-              <label for="id_description" class="form-label">Description</label>
-              {{ streamer_form.description }}
-            </div>
-            {{ streamer_form.profile_image_url }} {# Champ caché #}
-            <div class="mb-3">
-              <label class="form-label">Aperçu de l'image de profil</label>
-              <div id="profileImagePreview"></div>
-            </div>
-            <div class="mb-3">
-              <label for="id_email" class="form-label">Adresse email</label>
-              {{ streamer_form.email }}
-            </div>
-            <div class="mb-3">
-              <label for="id_discord" class="form-label">Discord</label>
-              {{ streamer_form.discord }}
+            <!-- Formulaire Staff -->
+            <div id="staffForm" style="display: none;">
+              <h5>Inscription Staff</h5>
+              {{ staff_form.as_p }}
             </div>
           </div>
-          <!-- Formulaire Staff -->
-          <div id="staffForm" style="display: none;">
-            <h5>Inscription Staff</h5>
-            {{ staff_form.as_p }}
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" class="btn btn-primary">Envoyer</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -146,6 +161,24 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
   }
+// Gestion de l'ajout dynamique des réseaux sociaux
+const addSocialBtn = document.getElementById("addSocialBtn");
+  addSocialBtn.addEventListener("click", function() {
+    const container = document.getElementById("social-accounts-container");
+    // Récupère le total actuel depuis le management form
+    const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
+    let formIndex = parseInt(totalFormsInput.value);
+    const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
+    // Remplacer __prefix__ par l'index actuel
+    const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
+    // Créer un div pour le nouveau formulaire
+    const newFormDiv = document.createElement("div");
+    newFormDiv.className = "social-account-form mb-2";
+    newFormDiv.innerHTML = newFormHtml;
+    container.appendChild(newFormDiv);
+    // Mettre à jour le compteur de formulaires
+    totalFormsInput.value = formIndex + 1;
+  });
 });
 </script>
 {% endblock %}

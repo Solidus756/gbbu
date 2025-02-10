@@ -38,3 +38,15 @@ class UserProfileForm(forms.ModelForm):
         tags_str = self.cleaned_data.get('tags', '')
         tag_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
         return tag_list
+
+SocialAccountFormSet = inlineformset_factory(
+    Streamer,
+    SocialAccount,
+    fields=["network", "username"],
+    extra=1,
+    can_delete=True,
+    widgets={
+        'network': forms.Select(attrs={'class': 'form-control'}),
+        'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom d’utilisateur'}),
+    }
+)

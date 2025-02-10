@@ -79,34 +79,32 @@ def profile_edit(request):
     return render(request, "accounts/profile_edit.html", {"form": form})
 
 def public_registration(request):
-    """
-    Vue de traitement de l'inscription publique via un formulaire unique.
-    Le formulaire comprend un menu déroulant qui permet de choisir entre
-    l'inscription de Streamer ou de Staff.
-    """
     if request.method == "POST":
         registration_type = request.POST.get("registration_type")
         if registration_type == "streamer":
-            form = StreamerForm(request.POST)
-            if form.is_valid():
-                streamer = form.save(commit=False)
+            streamer_form = StreamerForm(request.POST)
+            social_formset = SocialAccountFormSet(request.POST, prefix="socialaccount_set")
+            if streamer_form.is_valid() and social_formset.is_valid():
+                streamer = streamer_form.save(commit=False)
                 streamer.save()
-                # (Le signal va créer le User associé si nécessaire)
-                # Envoi d'un email de confirmation à l'utilisateur
+                social_formset.instance = streamer
+                social_formset.save()
+                # Envoi d'un email de confirmation
                 send_mail(
                     "Demande d'inscription reçue",
                     f"Bonjour {streamer.twitch_name},\n\nVotre demande d'inscription en tant que streamer a bien été reçue. Vous recevrez un email de confirmation dès qu'un organisateur aura validé votre inscription.",
                     "no-reply@charitystreaming.com",
                     [streamer.email],
                 )
-                messages.success(request, "Votre demande d'inscription a été envoyée. Vous recevrez un email de confirmation une fois validée par un organisateur.")
+                messages.success(request, "Votre demande d'inscription a été envoyée.")
                 return redirect("home")
             else:
                 messages.error(request, "Veuillez corriger les erreurs dans le formulaire Streamer.")
+                staff_form = StaffForm()
         elif registration_type == "staff":
-            form = StaffForm(request.POST)
-            if form.is_valid():
-                staff = form.save(commit=False)
+            staff_form = StaffForm(request.POST)
+            if staff_form.is_valid():
+                staff = staff_form.save(commit=False)
                 staff.save()
                 send_mail(
                     "Demande d'inscription reçue",
@@ -114,19 +112,23 @@ def public_registration(request):
                     "no-reply@charitystreaming.com",
                     [staff.email],
                 )
-                messages.success(request, "Votre demande d'inscription a été envoyée. Vous recevrez un email de confirmation une fois validée par un organisateur.")
+                messages.success(request, "Votre demande d'inscription a été envoyée.")
                 return redirect("home")
             else:
                 messages.error(request, "Veuillez corriger les erreurs dans le formulaire Staff.")
+                streamer_form = StreamerForm()
+                social_formset = SocialAccountFormSet(prefix="socialaccount_set")
         else:
             messages.error(request, "Veuillez choisir un type d'inscription.")
-        # Si le formulaire n'est pas valide, on va réafficher la page avec les formulaires pré-remplis
-        streamer_form = StreamerForm(request.POST) if registration_type == "streamer" else StreamerForm()
-        staff_form = StaffForm(request.POST) if registration_type == "staff" else StaffForm()
+            streamer_form = StreamerForm()
+            staff_form = StaffForm()
+            social_formset = SocialAccountFormSet(prefix="socialaccount_set")
     else:
         streamer_form = StreamerForm()
         staff_form = StaffForm()
+        social_formset = SocialAccountFormSet(prefix="socialaccount_set")
     return render(request, "accounts/public_registration.html", {
         'streamer_form': streamer_form,
         'staff_form': staff_form,
+        'social_formset': social_formset,
     })
