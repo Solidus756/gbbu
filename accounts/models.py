@@ -133,3 +133,14 @@ class StaffApplication(models.Model):
         """
         return ", ".join([tag.name for tag in self.tags.all()])
     get_tags_display.short_description = "Tags"
+
+class SMTPConfig(models.Model):
+    host = models.CharField(max_length=255, verbose_name="Serveur SMTP")
+    port = models.PositiveIntegerField(verbose_name="Port SMTP", default=587)
+    username = models.CharField(max_length=255, verbose_name="Nom d'utilisateur")
+    password = models.CharField(max_length=255, verbose_name="Mot de passe")
+    use_tls = models.BooleanField(default=True, verbose_name="Utiliser TLS")
+    use_ssl = models.BooleanField(default=False, verbose_name="Utiliser SSL")
+
+    def __str__(self):
+        return f"Configuration SMTP ({self.host}:{self.port})"
