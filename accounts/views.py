@@ -5,8 +5,9 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
+from notifications.models import Notification
 from .forms import StreamerForm, StaffApplicationForm, UserProfileForm, SocialAccountFormSet
-from .models import Streamer, UserProfile, Tag
+from .models import Streamer, UserProfile, Tag, StaffApplication
 
 def register_streamer(request):
     if request.method == "POST":
@@ -54,9 +55,32 @@ def user_login(request):
 
 @login_required
 def user_dashboard(request):
-    profile = getattr(request.user, 'profile', None)
-    context = {'user': request.user, 'profile': profile}
-    return render(request, "accounts/dashboard.html", context)
+    user = request.user
+    # Récupérer le nombre de notifications non lues pour l'utilisateur
+    notifications = Notification.objects.filter(recipient_user=user, is_read=False)
+    notif_count = notifications.count()
+    
+    # Vérifier le rôle de l'utilisateur
+    is_streamer = hasattr(user, 'streamer_profile')
+    is_staff = user.groups.filter(name="Staff").exists()
+    
+    staff_app = None
+    if is_staff:
+        # On suppose ici qu'une candidature staff validée (status 'staff' ou 'reserve') est liée à l'email de l'utilisateur
+        staff_apps = StaffApplication.objects.filter(email=user.email, status__in=['staff', 'reserve'])
+        if staff_apps.exists():
+            # Par exemple, on prend la dernière candidature
+            staff_app = staff_apps.latest('created_at')
+    
+    context = {
+        'user': user,
+        'notif_count': notif_count,
+        'notifications': notifications,
+        'is_streamer': is_streamer,
+        'is_staff': is_staff,
+        'staff_app': staff_app,
+    }
+    return render(request, 'accounts/dashboard.html', context)
 
 @login_required
 def profile_edit(request):
