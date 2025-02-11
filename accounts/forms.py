@@ -27,7 +27,7 @@ class StreamerForm(forms.ModelForm):
 class StaffApplicationForm(forms.ModelForm):
     class Meta:
         model = StaffApplication
-        fields = ['pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi']
+        fields = ['pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi', 'tags']
         widgets = {
             'pseudo': forms.TextInput(attrs={'class': 'form-control'}),
             'pseudo_discord': forms.TextInput(attrs={'class': 'form-control'}),
@@ -35,7 +35,10 @@ class StaffApplicationForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'poste_demande': forms.Select(attrs={'class': 'form-control'}),
             'pourquoi': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'tags': forms.HiddenInput(),  # Champ caché pour préserver les tags
         }
+
+
 
 
 class UserProfileForm(forms.ModelForm):
