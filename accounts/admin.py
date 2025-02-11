@@ -38,11 +38,7 @@ class StaffApplicationAdmin(admin.ModelAdmin):
     list_display = ('pseudo', 'poste_demande', 'status', 'created_at', 'postes_disponibles', 'nombre_reserve', 'get_tags_display')
     list_filter = ('status', 'poste_demande')
     search_fields = ('pseudo', 'email')
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        # Forcer le rechargement de l'instance pour obtenir les ManyToMany à jour
-        obj.refresh_from_db()
+    readonly_fields = ('get_tags_display',)
     
     # Vous pouvez ajouter ici des actions personnalisées si besoin
 admin.site.register(StaffApplication, StaffApplicationAdmin)
