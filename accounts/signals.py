@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -41,6 +42,8 @@ def send_validation_email(sender, instance, **kwargs):
         )
         send_mail(subject, message, "no-reply@charitystreaming.com", [instance.email])
 
+logger = logging.getLogger(__name__)
+
 @receiver(post_save, sender=StaffApplication)
 def add_tags_to_staff_application(sender, instance, created, **kwargs):
     """
@@ -50,6 +53,7 @@ def add_tags_to_staff_application(sender, instance, created, **kwargs):
     Cette opération s'exécute après la sauvegarde et n'enlève aucun tag existant.
     """
     # On ajoute toujours les tags si le status est 'staff' ou 'reserve'
+    logger.info("Signal post_save pour StaffApplication déclenché pour l'instance %s", instance)
     if instance.status == 'staff':
         # Tag "Staff"
         tag_staff, _ = Tag.objects.get_or_create(name="Staff")
@@ -57,8 +61,10 @@ def add_tags_to_staff_application(sender, instance, created, **kwargs):
         # Tag correspondant au poste demandé
         tag_poste, _ = Tag.objects.get_or_create(name=instance.poste_demande.poste)
         instance.tags.add(tag_poste)
+        logger.info("Tags ajoutés pour status 'staff' : Staff, %s", instance.poste_demande.poste)
     elif instance.status == 'reserve':
         # Tag pour la réserve
         tag_reserve_name = f"réserve-{instance.poste_demande.poste}"
         tag_reserve, _ = Tag.objects.get_or_create(name=tag_reserve_name)
         instance.tags.add(tag_reserve)
+        logger.info("Tag ajouté pour status 'reserve' : %s", tag_reserve_name)
