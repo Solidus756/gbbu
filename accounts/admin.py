@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
-from .models import Streamer, Staff, Tag, UserProfile,  BlacklistedStreamer, StaffPosition, StaffApplication
+from .models import Streamer, Staff, Tag, UserProfile,  BlacklistedStreamer, StaffPosition, StaffApplication, SMTPConfig
+
+
+admin.site.register(SMTPConfig)
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',)
