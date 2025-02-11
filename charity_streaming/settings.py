@@ -9,6 +9,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'change-me-secret-key')
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'gb.intradc.ovh', '192.168.0.19']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://gb.intradc.ovh',  # Ajoutez votre domaine ici
+]
+
 INSTALLED_APPS = [
     'jet',
     'jet.dashboard',
