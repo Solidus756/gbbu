@@ -2,27 +2,27 @@
 {% block title %}Modifier le Profil{% endblock %}
 {% block content %}
 <div class="container">
-  <h2>Modifier mon Profil</h2>
+  <h2 class="my-4">Modifier mon Profil</h2>
   <form method="post" id="profileEditForm">
     {% csrf_token %}
     <div class="mb-3">
       <label for="id_twitch_name" class="form-label">Twitch Name</label>
-      {{ streamer_form.twitch_name.as_widget(attrs={'readonly': 'readonly', 'class': 'form-control'}) }}
+      {{ streamer_form.twitch_name }}
       <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
     </div>
     <div class="mb-3">
-      <label for="id_email" class="form-label">Email</label>
-      {{ streamer_form.email.as_widget(attrs={'class': 'form-control'}) }}
+      <label for="id_email" class="form-label">Adresse email</label>
+      {{ streamer_form.email }}
     </div>
     <div class="mb-3">
       <label for="id_description" class="form-label">Description</label>
-      {{ streamer_form.description.as_widget(attrs={'class': 'form-control'}) }}
+      {{ streamer_form.description }}
     </div>
     <div class="mb-3">
       <label for="id_discord" class="form-label">Discord</label>
-      {{ streamer_form.discord.as_widget(attrs={'class': 'form-control'}) }}
+      {{ streamer_form.discord }}
     </div>
-    {{ streamer_form.profile_image_url }} {# Champ caché #}
+    {{ streamer_form.profile_image_url }}
     <div class="mb-3">
       <label class="form-label">Aperçu de l'image de chaîne</label>
       <div id="profileImagePreview">
@@ -46,14 +46,12 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    // Utilisation d'une URL similaire à celle de la recherche dans l'inscription
     fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
       .then(response => response.json())
       .then(data => {
         if (data.error) {
           alert(data.error);
         } else {
-          // Met à jour les champs description et l'image cachée
           document.getElementById("id_description").value = data.description;
           document.getElementById("id_profile_image_url").value = data.profile_image_url;
           document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
