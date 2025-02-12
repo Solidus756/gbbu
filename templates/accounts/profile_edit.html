@@ -20,7 +20,23 @@
         </div>
         <div class="modal-body">
           <!-- Formulaire principal (identique au formulaire d'inscription) -->
-          {{ streamer_form.as_p }}
+          <div class="mb-3">
+            <label for="{{ streamer_form.twitch_name.id_for_label }}" class="form-label">Twitch Name</label>
+            {{ streamer_form.twitch_name }}
+          </div>
+          <div class="mb-3">
+            <label for="{{ streamer_form.email.id_for_label }}" class="form-label">Adresse email</label>
+            {{ streamer_form.email }}
+          </div>
+          <div class="mb-3">
+            <label for="{{ streamer_form.description.id_for_label }}" class="form-label">Description</label>
+            {{ streamer_form.description }}
+          </div>
+          <div class="mb-3">
+            <label for="{{ streamer_form.discord.id_for_label }}" class="form-label">Discord</label>
+            {{ streamer_form.discord }}
+          </div>
+          
 
           <!-- Section pour les réseaux sociaux -->
           <h4>Réseaux Sociaux</h4>
