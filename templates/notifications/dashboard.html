@@ -1,17 +1,26 @@
-{% extends "base.html" %}
-{% block title %}Dashboard Notifications{% endblock %}
+{% extends "base_dashboard.html" %}
+{% block title %}Notifications - Charity Streaming{% endblock %}
 {% block content %}
-  <h2>Vos Notifications</h2>
-  <ul>
-    {% for notification in notifications %}
-      <li>
-        <strong>{{ notification.title }}</strong> - {{ notification.message }}
-        {% if not notification.is_read %}
-          <a href="{% url 'notifications:mark_notification_as_read' notification.id %}">Marquer comme lue</a>
-        {% endif %}
-      </li>
-    {% empty %}
-      <li>Aucune notification.</li>
-    {% endfor %}
-  </ul>
+<div class="container-fluid">
+  <h2>Notifications</h2>
+  <div class="row">
+    {% if notifications %}
+      {% for notif in notifications %}
+      <div class="col-md-4 mb-3">
+        <div class="card clickable" onclick="window.location.href='{% url 'notifications:detail' notif.id %}'">
+          <div class="card-body">
+            <h5 class="card-title">{{ notif.title }}</h5>
+            <!-- Vous pouvez afficher un résumé si nécessaire -->
+          </div>
+          <div class="card-footer text-end">
+            <a href="{% url 'notifications:mark_notification_as_read' notif.id %}" class="btn btn-sm btn-success">Marquer comme lue</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p>Aucune notification.</p>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
