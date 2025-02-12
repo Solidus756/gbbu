@@ -2,7 +2,7 @@
 {% block title %}Modifier mon Profil{% endblock %}
 {% block content %}
 <div class="container my-4">
-  <!-- Bouton qui déclenche directement la modale d'édition -->
+  <!-- Bouton déclencheur pour ouvrir la modale d'édition -->
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileEditModal">
     Modifier mon Profil
   </button>
@@ -19,16 +19,16 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Rendu du formulaire principal en utilisant as_p pour s'assurer que tous les champs s'affichent -->
+          <!-- Affichage du formulaire principal avec tous les champs -->
           {{ streamer_form.as_p }}
           
-          <!-- Bouton pour rafraîchir les infos via Twitch -->
+          <!-- Bouton pour rafraîchir les informations via Twitch -->
           <div class="mb-3">
             <button type="button" id="refreshTwitchBtn" class="btn btn-secondary">Raffraichir via Twitch</button>
           </div>
-
-          <!-- Section réseaux sociaux (formset) -->
-          <h5>Réseaux Sociaux</h5>
+          
+          <!-- Section des réseaux sociaux -->
+          <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
             {{ social_formset.management_form }}
             {% for form in social_formset %}
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (data.error) {
           alert(data.error);
         } else {
-          // Mise à jour des champs via DOM
+          // Mise à jour des champs Description et Image de profil
           document.getElementById("id_description").value = data.description;
           document.getElementById("id_profile_image_url").value = data.profile_image_url;
           document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
