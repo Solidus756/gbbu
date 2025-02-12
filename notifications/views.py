@@ -19,4 +19,4 @@ def mark_notification_as_read(request, notification_id):
 @login_required
 def notification_detail(request, pk):
     notif = get_object_or_404(Notification, pk=pk)
-    return render(request, "notifications/detail.html", {"notif": notif})
+    return render(request, "notifications/detail_partial.html", {"notif": notif})
