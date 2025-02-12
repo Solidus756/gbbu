@@ -1,0 +1,9 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Détail Notification{% endblock %}
+{% block content %}
+<div class="container">
+  <h2>{{ notif.title }}</h2>
+  <p>{{ notif.message }}</p>
+  <a href="{% url 'notifications:dashboard' %}" class="btn btn-secondary">Retour aux notifications</a>
+</div>
+{% endblock %}
