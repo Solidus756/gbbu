@@ -1,26 +1,26 @@
 {% extends "base_dashboard.html" %}
-{% block title %}Modifier le Profil{% endblock %}
+{% block title %}Modifier mon Profil{% endblock %}
 {% block content %}
 <div class="container">
-  <h2>Modifier mon Profil</h2>
+  <h2 class="my-4">Modifier mon Profil</h2>
   <form method="post" id="profileEditForm">
     {% csrf_token %}
     <div class="mb-3">
       <label for="id_twitch_name" class="form-label">Twitch Name</label>
-      {{ streamer_form.twitch_name.as_widget(attrs={'readonly': 'readonly', 'class': 'form-control'}) }}
+      {{ streamer_form.twitch_name }}  {# Le widget est défini en lecture seule dans le formulaire #}
       <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
     </div>
     <div class="mb-3">
-      <label for="id_email" class="form-label">Email</label>
-      {{ streamer_form.email.as_widget(attrs={'class': 'form-control'}) }}
+      <label for="id_email" class="form-label">Adresse email</label>
+      {{ streamer_form.email }}
     </div>
     <div class="mb-3">
       <label for="id_description" class="form-label">Description</label>
-      {{ streamer_form.description.as_widget(attrs={'class': 'form-control'}) }}
+      {{ streamer_form.description }}
     </div>
     <div class="mb-3">
       <label for="id_discord" class="form-label">Discord</label>
-      {{ streamer_form.discord.as_widget(attrs={'class': 'form-control'}) }}
+      {{ streamer_form.discord }}
     </div>
     {{ streamer_form.profile_image_url }} {# Champ caché #}
     <div class="mb-3">
@@ -31,6 +31,21 @@
         {% endif %}
       </div>
     </div>
+    <!-- Section d'édition des réseaux sociaux -->
+    <h4>Réseaux Sociaux</h4>
+    <div id="social-accounts-container">
+      {{ social_formset.management_form }}
+      {% for form in social_formset %}
+        <div class="social-account-form mb-2">
+          {{ form.as_p }}
+        </div>
+      {% endfor %}
+    </div>
+    <div id="empty-form-template" style="display: none;">
+      {{ social_formset.empty_form.as_p }}
+    </div>
+    <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
+    <br>
     <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
   </form>
 </div>
@@ -46,14 +61,12 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    // Utilisation d'une URL similaire à celle de la recherche dans l'inscription
     fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
       .then(response => response.json())
       .then(data => {
         if (data.error) {
           alert(data.error);
         } else {
-          // Met à jour les champs description et l'image cachée
           document.getElementById("id_description").value = data.description;
           document.getElementById("id_profile_image_url").value = data.profile_image_url;
           document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
@@ -64,6 +77,25 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error("Erreur lors de la mise à jour :", error);
         alert("Une erreur s'est produite, réessayez plus tard.");
       });
+  });
+
+  // Gestion de l'ajout dynamique des réseaux sociaux
+  const addSocialBtn = document.getElementById("addSocialBtn");
+  addSocialBtn.addEventListener("click", function() {
+    const container = document.getElementById("social-accounts-container");
+    const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
+    if (!totalFormsInput) {
+      console.error("Management form not found");
+      return;
+    }
+    let formIndex = parseInt(totalFormsInput.value);
+    const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
+    const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
+    const newFormDiv = document.createElement("div");
+    newFormDiv.className = "social-account-form mb-2";
+    newFormDiv.innerHTML = newFormHtml;
+    container.appendChild(newFormDiv);
+    totalFormsInput.value = formIndex + 1;
   });
 });
 </script>
