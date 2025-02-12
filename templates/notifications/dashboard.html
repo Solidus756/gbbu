@@ -2,18 +2,14 @@
 {% block title %}Notifications - Charity Streaming{% endblock %}
 {% block content %}
 <div class="container-fluid">
-  <h2>Notifications</h2>
+  <h2 class="my-4">Notifications</h2>
   <div class="row">
     {% if notifications %}
       {% for notif in notifications %}
       <div class="col-md-4 mb-3">
-        <div class="card clickable" onclick="window.location.href='{% url 'notifications:detail' notif.id %}'">
+        <div class="card clickable" data-bs-toggle="modal" data-bs-target="#notificationModal" data-notif-id="{{ notif.id }}">
           <div class="card-body">
             <h5 class="card-title">{{ notif.title }}</h5>
-            <!-- Vous pouvez afficher un résumé si nécessaire -->
-          </div>
-          <div class="card-footer text-end">
-            <a href="{% url 'notifications:mark_notification_as_read' notif.id %}" class="btn btn-sm btn-success">Marquer comme lue</a>
           </div>
         </div>
       </div>
@@ -23,4 +19,45 @@
     {% endif %}
   </div>
 </div>
+
+<!-- Modal de notification -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notificationModalLabel">Détail Notification</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body" id="notificationDetailContent">
+        <!-- Détail de la notification chargé par AJAX -->
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="markAsReadBtn" class="btn btn-success">Marquer comme lue</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const notificationModal = document.getElementById('notificationModal');
+  notificationModal.addEventListener('show.bs.modal', function (event) {
+    const card = event.relatedTarget;
+    const notifId = card.getAttribute('data-notif-id');
+    fetch("{% url 'notifications:detail' 0 %}".replace("0", notifId))
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('notificationDetailContent').innerHTML = html;
+        document.getElementById('markAsReadBtn').href = "{% url 'notifications:mark_notification_as_read' 0 %}".replace("0", notifId);
+      })
+      .catch(error => {
+        console.error("Erreur de chargement de la notification :", error);
+        document.getElementById('notificationDetailContent').innerHTML = "<p>Erreur lors du chargement de la notification.</p>";
+      });
+  });
+});
+</script>
 {% endblock %}
