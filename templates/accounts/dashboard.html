@@ -98,11 +98,64 @@
             <p><strong>Pourquoi je veux rejoindre le staff :</strong> {{ staff_app.pourquoi }}</p>
             <p><strong>Status :</strong> {{ staff_app.get_status_display }}</p>
           {% endif %}
-
-          <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary mt-3">Modifier mon Profil</a>
+          
+          <!-- Bouton pour ouvrir la modale d'édition directement -->
+          <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#profileEditModal">
+            Modifier mon Profil
+          </button>
         </div>
       </div>
     </main>
   </div>
 </div>
-{% endblock %}
+
+<!-- Modale d'édition du profil intégrée -->
+<div class="modal fade" id="profileEditModal" tabindex="-1" aria-labelledby="profileEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" id="profileEditForm" action="{% url 'accounts:profile_edit' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileEditModalLabel">Modifier mon Profil</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Champs du profil streamer -->
+          <div class="mb-3">
+            <label for="id_twitch_name" class="form-label">Twitch Name</label>
+            {{ streamer_form.twitch_name }}
+            <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
+          </div>
+          <div class="mb-3">
+            <label for="id_email" class="form-label">Adresse email</label>
+            {{ streamer_form.email }}
+          </div>
+          <div class="mb-3">
+            <label for="id_description" class="form-label">Description</label>
+            {{ streamer_form.description }}
+          </div>
+          <div class="mb-3">
+            <label for="id_discord" class="form-label">Discord</label>
+            {{ streamer_form.discord }}
+          </div>
+          {{ streamer_form.profile_image_url }} {# Champ caché #}
+          <div class="mb-3">
+            <label class="form-label">Aperçu de l'image de chaîne</label>
+            <div id="profileImagePreview">
+              {% if user.streamer_profile.profile_image_url %}
+                <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
+              {% endif %}
+            </div>
+          </div>
+          <!-- Section réseaux sociaux -->
+          <h5>Réseaux Sociaux</h5>
+          <div id="social-accounts-container">
+            {{ social_formset.management_form }}
+            {% for form in social_formset %}
+              <div class="social-account-form mb-2">
+                {{ form.as_p }}
+              </div>
+            {% endfor %}
+          </div>
+          <div id="empty-form-template" style="display: none;">
+            {{ social_forms
