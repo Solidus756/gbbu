@@ -2,51 +2,32 @@
 {% block title %}Modifier mon Profil{% endblock %}
 {% block content %}
 <div class="container my-4">
-  <!-- Bouton pour ouvrir la modale d'édition -->
+  <!-- Bouton qui déclenche directement la modale d'édition -->
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileEditModal">
     Modifier mon Profil
   </button>
 </div>
 
-<!-- Modal de modification du profil -->
+<!-- Modale d'édition du profil -->
 <div class="modal fade" id="profileEditModal" tabindex="-1" aria-labelledby="profileEditModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form method="post" id="profileEditForm">
+      <form method="post" id="profileEditForm" action="{% url 'accounts:profile_edit' %}">
         {% csrf_token %}
         <div class="modal-header">
           <h5 class="modal-title" id="profileEditModalLabel">Modifier mon Profil</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Champs du profil streamer -->
+          <!-- Rendu du formulaire principal en utilisant as_p pour s'assurer que tous les champs s'affichent -->
+          {{ streamer_form.as_p }}
+          
+          <!-- Bouton pour rafraîchir les infos via Twitch -->
           <div class="mb-3">
-            <label for="id_twitch_name" class="form-label">Twitch Name</label>
-            {{ streamer_form.twitch_name }}
-            <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
+            <button type="button" id="refreshTwitchBtn" class="btn btn-secondary">Raffraichir via Twitch</button>
           </div>
-          <div class="mb-3">
-            <label for="id_email" class="form-label">Adresse email</label>
-            {{ streamer_form.email }}
-          </div>
-          <div class="mb-3">
-            <label for="id_description" class="form-label">Description</label>
-            {{ streamer_form.description }}
-          </div>
-          <div class="mb-3">
-            <label for="id_discord" class="form-label">Discord</label>
-            {{ streamer_form.discord }}
-          </div>
-          {{ streamer_form.profile_image_url }} {# Champ caché #}
-          <div class="mb-3">
-            <label class="form-label">Aperçu de l'image de chaîne</label>
-            <div id="profileImagePreview">
-              {% if user.streamer_profile.profile_image_url %}
-                <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
-              {% endif %}
-            </div>
-          </div>
-          <!-- Section réseaux sociaux -->
+
+          <!-- Section réseaux sociaux (formset) -->
           <h5>Réseaux Sociaux</h5>
           <div id="social-accounts-container">
             {{ social_formset.management_form }}
@@ -74,7 +55,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Bouton "Raffraichir via Twitch"
+  // Bouton de rafraîchissement via Twitch dans la modale
   const refreshBtn = document.getElementById("refreshTwitchBtn");
   refreshBtn.addEventListener("click", function() {
     const twitchName = document.getElementById("id_twitch_name").value.trim();
@@ -88,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (data.error) {
           alert(data.error);
         } else {
+          // Mise à jour des champs via DOM
           document.getElementById("id_description").value = data.description;
           document.getElementById("id_profile_image_url").value = data.profile_image_url;
           document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
@@ -100,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   });
 
-  // Gestion de l'ajout dynamique des réseaux sociaux
+  // Gestion de l'ajout dynamique des réseaux sociaux dans la modale
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
     const container = document.getElementById("social-accounts-container");
