@@ -84,24 +84,28 @@ def user_dashboard(request):
 
 @login_required
 def profile_edit(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    # On suppose que l'utilisateur a un profil streamer lié via l'attribut 'streamer_profile'
+    streamer_profile = getattr(request.user, 'streamer_profile', None)
+    if not streamer_profile:
+        messages.error(request, "Aucun profil streamer n'est associé à cet utilisateur.")
+        return redirect('accounts:dashboard')
+    
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            tag_names = form.cleaned_data['tags']
-            profile.tags.clear()
-            for tag_name in tag_names:
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                profile.tags.add(tag)
-            profile.save()
-            messages.success(request, "Profil mis à jour avec succès.")
+        streamer_form = StreamerForm(request.POST, instance=streamer_profile)
+        social_formset = SocialAccountFormSet(request.POST, instance=streamer_profile, prefix="socialaccount_set")
+        if streamer_form.is_valid() and social_formset.is_valid():
+            streamer_form.save()
+            social_formset.save()
+            messages.success(request, "Profil mis à jour.")
             return redirect('accounts:dashboard')
-        else:
-            messages.error(request, "Erreur lors de la mise à jour du profil.")
     else:
-        existing_tags = ", ".join([tag.name for tag in profile.tags.all()])
-        form = UserProfileForm(instance=profile, initial={'tags': existing_tags})
-    return render(request, "accounts/profile_edit.html", {"form": form})
+        streamer_form = StreamerForm(instance=streamer_profile)
+        social_formset = SocialAccountFormSet(instance=streamer_profile, prefix="socialaccount_set")
+        
+    return render(request, "accounts/profile_edit.html", {
+        "streamer_form": streamer_form,
+        "social_formset": social_formset,
+    })
 
 def public_registration(request):
     if request.method == "POST":
