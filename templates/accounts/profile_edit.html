@@ -2,7 +2,7 @@
 {% block title %}Modifier mon Profil{% endblock %}
 {% block content %}
 <div class="container my-4">
-  <!-- Bouton déclencheur pour ouvrir la modale d'édition -->
+  <!-- Bouton qui ouvre la modale d'édition -->
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileEditModal">
     Modifier mon Profil
   </button>
@@ -19,57 +19,17 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Rendu individuel des champs du formulaire -->
-          <div class="mb-3">
-            <label for="{{ streamer_form.twitch_name.id_for_label }}" class="form-label">Twitch Name</label>
-            {{ streamer_form.twitch_name }}
-            <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
-          </div>
-          <div class="mb-3">
-            <label for="{{ streamer_form.email.id_for_label }}" class="form-label">Adresse email</label>
-            {{ streamer_form.email }}
-          </div>
-          <div class="mb-3">
-            <label for="{{ streamer_form.description.id_for_label }}" class="form-label">Description</label>
-            {{ streamer_form.description }}
-          </div>
-          <div class="mb-3">
-            <label for="{{ streamer_form.discord.id_for_label }}" class="form-label">Discord</label>
-            {{ streamer_form.discord }}
-          </div>
-          <!-- Champ caché pour l'image de profil -->
-          {{ streamer_form.profile_image_url }}
-          <div class="mb-3">
-            <label class="form-label">Aperçu de l'image de chaîne</label>
-            <div id="profileImagePreview">
-              {% if user.streamer_profile.profile_image_url %}
-                <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
-              {% endif %}
-            </div>
-          </div>
-          
-          <!-- Section d'édition des réseaux sociaux -->
-          <h5>Réseaux Sociaux</h5>
+          <!-- Formulaire principal (identique au formulaire d'inscription) -->
+          {{ streamer_form.as_p }}
+
+          <!-- Section pour les réseaux sociaux -->
+          <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
             {{ social_formset.management_form }}
-            {% for form in social_formset %}
-              <div class="social-account-form mb-2">
-                {% for field in form %}
-                  <div class="mb-2">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endfor %}
+            {{ social_formset.as_p }}
           </div>
           <div id="empty-form-template" style="display: none;">
-            {% for field in social_formset.empty_form %}
-              <div class="mb-2">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field }}
-              </div>
-            {% endfor %}
+            {{ social_formset.empty_form.as_p }}
           </div>
           <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
         </div>
@@ -86,33 +46,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Bouton de rafraîchissement via Twitch
-  const refreshBtn = document.getElementById("refreshTwitchBtn");
-  refreshBtn.addEventListener("click", function() {
-    const twitchName = document.getElementById("id_twitch_name").value.trim();
-    if (!twitchName) {
-      alert("Aucun nom Twitch.");
-      return;
-    }
-    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          document.getElementById("id_description").value = data.description;
-          document.getElementById("id_profile_image_url").value = data.profile_image_url;
-          document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
-          alert("Informations mises à jour !");
-        }
-      })
-      .catch(error => {
-        console.error("Erreur lors de la mise à jour :", error);
-        alert("Une erreur s'est produite, réessayez plus tard.");
-      });
-  });
-
-  // Ajout dynamique des réseaux sociaux
+  // Gestion de l'ajout dynamique des réseaux sociaux dans la modale
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
     const container = document.getElementById("social-accounts-container");
@@ -125,9 +59,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
     const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
     const newFormDiv = document.createElement("div");
-    newFormDiv.className = "social-account-form mb-2";
+    newFormDiv.className = "mb-2";
     newFormDiv.innerHTML = newFormHtml;
-    container.appendChild(newFormDiv);
+    // Ajout juste avant le bouton "Ajouter un réseau"
+    container.insertBefore(newFormDiv, addSocialBtn);
     totalFormsInput.value = formIndex + 1;
   });
 });
