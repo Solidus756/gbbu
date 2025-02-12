@@ -158,4 +158,67 @@
             {% endfor %}
           </div>
           <div id="empty-form-template" style="display: none;">
-            {{ social_forms
+            {{ social_formset.empty_form.as_p }}
+          </div>
+          <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Bouton de rafraîchissement via Twitch dans la modale
+  const refreshBtn = document.getElementById("refreshTwitchBtn");
+  refreshBtn.addEventListener("click", function() {
+    const twitchName = document.getElementById("id_twitch_name").value.trim();
+    if (!twitchName) {
+      alert("Aucun nom Twitch.");
+      return;
+    }
+    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          document.getElementById("id_description").value = data.description;
+          document.getElementById("id_profile_image_url").value = data.profile_image_url;
+          document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
+          alert("Informations mises à jour !");
+        }
+      })
+      .catch(error => {
+        console.error("Erreur lors de la mise à jour :", error);
+        alert("Une erreur s'est produite, réessayez plus tard.");
+      });
+  });
+
+  // Gestion de l'ajout dynamique des réseaux sociaux dans la modale
+  const addSocialBtn = document.getElementById("addSocialBtn");
+  addSocialBtn.addEventListener("click", function() {
+    const container = document.getElementById("social-accounts-container");
+    const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
+    if (!totalFormsInput) {
+      console.error("Management form not found");
+      return;
+    }
+    let formIndex = parseInt(totalFormsInput.value);
+    const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
+    const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
+    const newFormDiv = document.createElement("div");
+    newFormDiv.className = "social-account-form mb-2";
+    newFormDiv.innerHTML = newFormHtml;
+    container.appendChild(newFormDiv);
+    totalFormsInput.value = formIndex + 1;
+  });
+});
+</script>
+{% endblock %}
