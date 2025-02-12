@@ -1,59 +1,80 @@
 {% extends "base_dashboard.html" %}
 {% block title %}Modifier mon Profil{% endblock %}
 {% block content %}
-<div class="container">
-  <h2 class="my-4">Modifier mon Profil</h2>
-  <form method="post" id="profileEditForm">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="id_twitch_name" class="form-label">Twitch Name</label>
-      {{ streamer_form.twitch_name }}  {# Le widget est défini en lecture seule dans le formulaire #}
-      <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
-    </div>
-    <div class="mb-3">
-      <label for="id_email" class="form-label">Adresse email</label>
-      {{ streamer_form.email }}
-    </div>
-    <div class="mb-3">
-      <label for="id_description" class="form-label">Description</label>
-      {{ streamer_form.description }}
-    </div>
-    <div class="mb-3">
-      <label for="id_discord" class="form-label">Discord</label>
-      {{ streamer_form.discord }}
-    </div>
-    {{ streamer_form.profile_image_url }} {# Champ caché #}
-    <div class="mb-3">
-      <label class="form-label">Aperçu de l'image de chaîne</label>
-      <div id="profileImagePreview">
-        {% if user.streamer_profile.profile_image_url %}
-          <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
-        {% endif %}
-      </div>
-    </div>
-    <!-- Section d'édition des réseaux sociaux -->
-    <h4>Réseaux Sociaux</h4>
-    <div id="social-accounts-container">
-      {{ social_formset.management_form }}
-      {% for form in social_formset %}
-        <div class="social-account-form mb-2">
-          {{ form.as_p }}
+<div class="container my-4">
+  <!-- Bouton pour ouvrir la modale d'édition -->
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileEditModal">
+    Modifier mon Profil
+  </button>
+</div>
+
+<!-- Modal de modification du profil -->
+<div class="modal fade" id="profileEditModal" tabindex="-1" aria-labelledby="profileEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" id="profileEditForm">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileEditModalLabel">Modifier mon Profil</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
-      {% endfor %}
+        <div class="modal-body">
+          <!-- Champs du profil streamer -->
+          <div class="mb-3">
+            <label for="id_twitch_name" class="form-label">Twitch Name</label>
+            {{ streamer_form.twitch_name }}
+            <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
+          </div>
+          <div class="mb-3">
+            <label for="id_email" class="form-label">Adresse email</label>
+            {{ streamer_form.email }}
+          </div>
+          <div class="mb-3">
+            <label for="id_description" class="form-label">Description</label>
+            {{ streamer_form.description }}
+          </div>
+          <div class="mb-3">
+            <label for="id_discord" class="form-label">Discord</label>
+            {{ streamer_form.discord }}
+          </div>
+          {{ streamer_form.profile_image_url }} {# Champ caché #}
+          <div class="mb-3">
+            <label class="form-label">Aperçu de l'image de chaîne</label>
+            <div id="profileImagePreview">
+              {% if user.streamer_profile.profile_image_url %}
+                <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
+              {% endif %}
+            </div>
+          </div>
+          <!-- Section réseaux sociaux -->
+          <h5>Réseaux Sociaux</h5>
+          <div id="social-accounts-container">
+            {{ social_formset.management_form }}
+            {% for form in social_formset %}
+              <div class="social-account-form mb-2">
+                {{ form.as_p }}
+              </div>
+            {% endfor %}
+          </div>
+          <div id="empty-form-template" style="display: none;">
+            {{ social_formset.empty_form.as_p }}
+          </div>
+          <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        </div>
+      </form>
     </div>
-    <div id="empty-form-template" style="display: none;">
-      {{ social_formset.empty_form.as_p }}
-    </div>
-    <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
-    <br>
-    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-  </form>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+  // Bouton "Raffraichir via Twitch"
   const refreshBtn = document.getElementById("refreshTwitchBtn");
   refreshBtn.addEventListener("click", function() {
     const twitchName = document.getElementById("id_twitch_name").value.trim();
