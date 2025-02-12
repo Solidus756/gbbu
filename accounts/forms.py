@@ -11,6 +11,9 @@ class StreamerForm(forms.ModelForm):
         widgets = {
             'twitch_name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'profile_image_url': forms.HiddenInput(),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'discord': forms.TextInput(attrs={'class': 'form-control'}),
             'presence_mode': forms.Select(attrs={'class': 'form-control'}),
         }
     
