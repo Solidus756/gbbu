@@ -9,13 +9,13 @@ class StreamerForm(forms.ModelForm):
         model = Streamer
         fields = ['twitch_name', 'email', 'description', 'discord', 'profile_image_url', 'presence_mode']
         widgets = {
+            'twitch_name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'profile_image_url': forms.HiddenInput(),
             'presence_mode': forms.Select(attrs={'class': 'form-control'}),
         }
     
     def clean_twitch_name(self):
         tw_name = self.cleaned_data.get('twitch_name', '').strip()
-        # Vérification insensible à la casse pour éviter les doublons
         if self.instance.pk:
             qs = Streamer.objects.filter(twitch_name__iexact=tw_name).exclude(pk=self.instance.pk)
         else:
