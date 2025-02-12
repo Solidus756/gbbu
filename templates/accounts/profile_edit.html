@@ -1,11 +1,70 @@
-{% extends "base.html" %}
+{% extends "base_dashboard.html" %}
 {% block title %}Modifier le Profil{% endblock %}
 {% block content %}
-  <h2>Modifier votre profil</h2>
-  <form method="post">
+<div class="container">
+  <h2>Modifier mon Profil</h2>
+  <form method="post" id="profileEditForm">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Enregistrer</button>
+    <div class="mb-3">
+      <label for="id_twitch_name" class="form-label">Twitch Name</label>
+      {{ streamer_form.twitch_name.as_widget(attrs={'readonly': 'readonly', 'class': 'form-control'}) }}
+      <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mt-2">Raffraichir via Twitch</button>
+    </div>
+    <div class="mb-3">
+      <label for="id_email" class="form-label">Email</label>
+      {{ streamer_form.email.as_widget(attrs={'class': 'form-control'}) }}
+    </div>
+    <div class="mb-3">
+      <label for="id_description" class="form-label">Description</label>
+      {{ streamer_form.description.as_widget(attrs={'class': 'form-control'}) }}
+    </div>
+    <div class="mb-3">
+      <label for="id_discord" class="form-label">Discord</label>
+      {{ streamer_form.discord.as_widget(attrs={'class': 'form-control'}) }}
+    </div>
+    {{ streamer_form.profile_image_url }} {# Champ caché #}
+    <div class="mb-3">
+      <label class="form-label">Aperçu de l'image de chaîne</label>
+      <div id="profileImagePreview">
+        {% if user.streamer_profile.profile_image_url %}
+          <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
+        {% endif %}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
   </form>
-  <p><a href="{% url 'accounts:dashboard' %}">Retour au dashboard</a></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const refreshBtn = document.getElementById("refreshTwitchBtn");
+  refreshBtn.addEventListener("click", function() {
+    const twitchName = document.getElementById("id_twitch_name").value.trim();
+    if (!twitchName) {
+      alert("Aucun nom Twitch.");
+      return;
+    }
+    // Utilisation d'une URL similaire à celle de la recherche dans l'inscription
+    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          // Met à jour les champs description et l'image cachée
+          document.getElementById("id_description").value = data.description;
+          document.getElementById("id_profile_image_url").value = data.profile_image_url;
+          document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
+          alert("Informations mises à jour !");
+        }
+      })
+      .catch(error => {
+        console.error("Erreur lors de la mise à jour :", error);
+        alert("Une erreur s'est produite, réessayez plus tard.");
+      });
+  });
+});
+</script>
 {% endblock %}
