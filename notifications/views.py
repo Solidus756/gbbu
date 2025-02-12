@@ -15,3 +15,8 @@ def mark_notification_as_read(request, notification_id):
     notification.save()
     messages.success(request, "Notification marquée comme lue.")
     return redirect("notifications:dashboard")
+
+@login_required
+def notification_detail(request, pk):
+    notif = get_object_or_404(Notification, pk=pk)
+    return render(request, "notifications/detail.html", {"notif": notif})
