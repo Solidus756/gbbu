@@ -4,39 +4,52 @@
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar -->
-    <nav class="col-md-3 sidebar bg-dark text-white p-3">
-      <h3 class="mb-4">Menu</h3>
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link text-white" href="{% url 'accounts:dashboard' %}"><i class="fas fa-user"></i> Mon Profil</a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-white" href="{% url 'notifications:dashboard' %}">
-            <i class="fas fa-bell"></i> Notifications 
-            {% if notif_count > 0 %}
-              <span class="badge bg-danger">{{ notif_count }}</span>
-            {% endif %}
-          </a>
-        </li>
-        {% if is_staff %}
-        <li class="nav-item mb-2">
-          <a class="nav-link text-white" href="{% url 'staff:staff_effectif' %}"><i class="fas fa-users"></i> Staff Effectif</a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-white" href="{% url 'staff:candidatures' %}"><i class="fas fa-user-plus"></i> Candidatures</a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-white" href="{% url 'staff:reserve' %}"><i class="fas fa-user-clock"></i> Réserve</a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link text-white" href="{% url 'staff:postes' %}"><i class="fas fa-briefcase"></i> Postes</a>
-        </li>
-        {% endif %}
-      </ul>
+    <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse" id="sidebarMenu">
+      <div class="position-sticky pt-3">
+        <h3 class="text-white px-3">Menu</h3>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'accounts:dashboard' %}">
+              <i class="fas fa-user"></i> Mon Profil
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'notifications:dashboard' %}">
+              <i class="fas fa-bell"></i> Notifications 
+              {% if notif_count > 0 %}
+                <span class="badge bg-danger">{{ notif_count }}</span>
+              {% endif %}
+            </a>
+          </li>
+          {% if is_staff %}
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'staff:staff_effectif' %}">
+              <i class="fas fa-users"></i> Staff Effectif
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'staff:candidatures' %}">
+              <i class="fas fa-user-plus"></i> Candidatures
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'staff:reserve' %}">
+              <i class="fas fa-user-clock"></i> Réserve
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'staff:postes' %}">
+              <i class="fas fa-briefcase"></i> Postes
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </nav>
 
     <!-- Main content -->
-    <main class="col-md-9 content p-4">
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <!-- Votre contenu du dashboard ici -->
       <div class="card mb-4">
         <div class="card-header">
           <h4>Résumé du profil</h4>
@@ -44,49 +57,49 @@
         <div class="card-body">
           <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
           {% if is_streamer %}
-          <p><strong>Twitch :</strong> {{ user.streamer_profile.twitch_name }}</p>
-          <p><strong>Email :</strong> {{ user.streamer_profile.email }}</p>
-          <p><strong>Description :</strong> {{ user.streamer_profile.description }}</p>
-          <p><strong>Discord :</strong> {{ user.streamer_profile.discord }}</p>
-          <p><strong>Image de chaîne :</strong></p>
-          <div>
-            <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
-          </div>
-          <p><strong>Réseaux sociaux :</strong></p>
-          <ul class="list-group">
-            {% for soc in user.streamer_profile.social_accounts.all %}
-              <li class="list-group-item">
-                {% if soc.network == "twitter" %}
-                  <i class="fab fa-twitter"></i>
-                {% elif soc.network == "youtube" %}
-                  <i class="fab fa-youtube"></i>
-                {% elif soc.network == "instagram" %}
-                  <i class="fab fa-instagram"></i>
-                {% elif soc.network == "facebook" %}
-                  <i class="fab fa-facebook"></i>
-                {% elif soc.network == "tiktok" %}
-                  <i class="fab fa-tiktok"></i>
-                {% endif %}
-                {{ soc.username }}
-              </li>
-            {% empty %}
-              <li class="list-group-item">Aucun réseau social enregistré.</li>
-            {% endfor %}
-          </ul>
+            <p><strong>Twitch :</strong> {{ user.streamer_profile.twitch_name }}</p>
+            <p><strong>Email :</strong> {{ user.streamer_profile.email }}</p>
+            <p><strong>Description :</strong> {{ user.streamer_profile.description }}</p>
+            <p><strong>Discord :</strong> {{ user.streamer_profile.discord }}</p>
+            <div>
+              <strong>Image de chaîne :</strong>
+              <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
+            </div>
+            <p><strong>Réseaux sociaux :</strong></p>
+            <ul class="list-group">
+              {% for soc in user.streamer_profile.social_accounts.all %}
+                <li class="list-group-item">
+                  {% if soc.network == "twitter" %}
+                    <i class="fab fa-twitter"></i>
+                  {% elif soc.network == "youtube" %}
+                    <i class="fab fa-youtube"></i>
+                  {% elif soc.network == "instagram" %}
+                    <i class="fab fa-instagram"></i>
+                  {% elif soc.network == "facebook" %}
+                    <i class="fab fa-facebook"></i>
+                  {% elif soc.network == "tiktok" %}
+                    <i class="fab fa-tiktok"></i>
+                  {% endif %}
+                  {{ soc.username }}
+                </li>
+              {% empty %}
+                <li class="list-group-item">Aucun réseau social enregistré.</li>
+              {% endfor %}
+            </ul>
           {% endif %}
 
           {% if is_staff and staff_app %}
-          <hr>
-          <h5>Détails Staff</h5>
-          <p><strong>Pseudo :</strong> {{ staff_app.pseudo }}</p>
-          <p><strong>Pseudo Discord :</strong> {{ staff_app.pseudo_discord }}</p>
-          <p><strong>Pseudo Twitch :</strong> {{ staff_app.pseudo_twitch }}</p>
-          <p><strong>Email :</strong> {{ staff_app.email }}</p>
-          <p><strong>Poste demandé :</strong> {{ staff_app.poste_demande.poste }}</p>
-          <p><strong>Pourquoi je veux rejoindre le staff :</strong> {{ staff_app.pourquoi }}</p>
-          <p><strong>Status :</strong> {{ staff_app.get_status_display }}</p>
+            <hr>
+            <h5>Détails Staff</h5>
+            <p><strong>Pseudo :</strong> {{ staff_app.pseudo }}</p>
+            <p><strong>Pseudo Discord :</strong> {{ staff_app.pseudo_discord }}</p>
+            <p><strong>Pseudo Twitch :</strong> {{ staff_app.pseudo_twitch }}</p>
+            <p><strong>Email :</strong> {{ staff_app.email }}</p>
+            <p><strong>Poste demandé :</strong> {{ staff_app.poste_demande.poste }}</p>
+            <p><strong>Pourquoi je veux rejoindre le staff :</strong> {{ staff_app.pourquoi }}</p>
+            <p><strong>Status :</strong> {{ staff_app.get_status_display }}</p>
           {% endif %}
-          
+
           <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary mt-3">Modifier mon profil</a>
         </div>
       </div>
