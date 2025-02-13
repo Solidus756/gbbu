@@ -86,3 +86,36 @@ def ajax_fetch_streamer_info(request):
             return JsonResponse({'error': "Aucune information trouvée pour ce nom."}, status=404)
     else:
         return JsonResponse({'error': "Erreur lors de la récupération des informations."}, status=500)
+    
+def ajax_update_streamer_info(request):
+    twitch_name = request.GET.get('twitch_name', '').strip()
+    if not twitch_name:
+        return JsonResponse({'error': 'Aucun nom Twitch fourni.'}, status=400)
+    
+    normalized_name = twitch_name.lower()
+    
+    # Ici, on ignore la vérification de doublon et de blacklist
+    token = get_twitch_token()
+    if not token:
+        return JsonResponse({'error': "Impossible de récupérer le token Twitch."}, status=500)
+    
+    headers = {
+        'Client-ID': settings.TWITCH_CLIENT_ID,
+        'Authorization': f'Bearer {token}',
+    }
+    url = f"https://api.twitch.tv/helix/users?login={normalized_name}"
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json().get('data', [])
+        if data:
+            user_info = data[0]
+            description = user_info.get('description', '')
+            profile_image_url = user_info.get('profile_image_url', '')
+            return JsonResponse({
+                'description': description,
+                'profile_image_url': profile_image_url,
+            })
+        else:
+            return JsonResponse({'error': "Aucune information trouvée pour ce nom."}, status=404)
+    else:
+        return JsonResponse({'error': "Erreur lors de la récupération des informations."}, status=500)

@@ -19,18 +19,12 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Rendu complet du formulaire principal (identique au formulaire d'inscription) -->
           {{ streamer_form.as_p }}
-          
-          <!-- Bouton de rafraîchissement via Twitch avec update=true -->
           <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
           
-          <!-- Section Réseaux Sociaux -->
           <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
-            <!-- Le management form doit être rendu une seule fois -->
             {{ social_formset.management_form }}
-            <!-- Conteneur dédié pour les formulaires du formset -->
             <div id="social-accounts-forms">
               {{ social_formset.as_p }}
             </div>
@@ -63,10 +57,10 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    // Construction de l'URL incluant update=true et un cache-buster pour éviter le caching
-    const url = "{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" 
+    // Utilisation de la nouvelle URL dédiée à l'update
+    const url = "{% url 'twitch:ajax_update_streamer_info' %}?twitch_name=" 
                 + encodeURIComponent(twitchName) 
-                + "&update=true&_=" + new Date().getTime();
+                + "&_=" + new Date().getTime();
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -86,10 +80,9 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   });
 
-  // Gestion de l'ajout dynamique des réseaux sociaux
+  // Ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
-    // On insère les nouveaux formulaires dans le conteneur dédié
     const container = document.getElementById("social-accounts-forms");
     const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
     if (!totalFormsInput) {
