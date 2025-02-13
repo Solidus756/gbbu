@@ -63,9 +63,9 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    // Ajout explicite du paramètre update=true
+    // Construction de l'URL avec update=true et un paramètre cache-buster pour forcer l'actualisation
     var url = "{% url 'twitch:ajax_fetch_streamer_info' %}";
-    url += "?twitch_name=" + encodeURIComponent(twitchName) + "&update=true";
+    url += "?twitch_name=" + encodeURIComponent(twitchName) + "&update=true&_=" + new Date().getTime();
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Gestion de l'ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
-    const formsContainer = document.getElementById("social-accounts-forms");
+    const container = document.getElementById("social-accounts-forms");
     const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
     if (!totalFormsInput) {
       console.error("Management form not found");
@@ -96,10 +96,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let formIndex = parseInt(totalFormsInput.value);
     const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
     const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
-    // Insérer le nouveau formulaire dans le conteneur dédié
-    formsContainer.insertAdjacentHTML('beforeend', newFormHtml);
+    container.insertAdjacentHTML('beforeend', newFormHtml);
     totalFormsInput.value = formIndex + 1;
   });
-});
 </script>
 {% endblock %}
