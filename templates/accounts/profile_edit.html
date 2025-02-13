@@ -66,22 +66,22 @@ document.addEventListener("DOMContentLoaded", function() {
     // Construction de l'URL avec update=true et un paramètre cache-buster pour forcer l'actualisation
     var url = "{% url 'twitch:ajax_fetch_streamer_info' %}";
     url += "?twitch_name=" + encodeURIComponent(twitchName) + "&update=true&_=" + new Date().getTime();
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          document.getElementById("id_description").value = data.description;
-          document.getElementById("id_profile_image_url").value = data.profile_image_url;
-          document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
-          alert("Informations mises à jour !");
-        }
-      })
-      .catch(error => {
-        console.error("Erreur lors de la mise à jour :", error);
-        alert("Une erreur s'est produite, réessayez plus tard.");
-      });
+      fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName) + "&update=true&_=" + new Date().getTime())
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        document.getElementById("id_description").value = data.description;
+        document.getElementById("id_profile_image_url").value = data.profile_image_url;
+        document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
+        alert("Informations mises à jour !");
+      }
+    })
+    .catch(error => {
+      console.error("Erreur lors de la mise à jour :", error);
+      alert("Une erreur s'est produite, réessayez plus tard.");
+    });
   });
 
   // Gestion de l'ajout dynamique des réseaux sociaux
