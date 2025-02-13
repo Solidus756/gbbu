@@ -28,15 +28,17 @@ def create_user_for_streamer(sender, instance, created, **kwargs):
         instance.save()
 
 @receiver(post_save, sender=Streamer)
-def send_validation_email(sender, instance, **kwargs):
-    if instance.validated_by_admin and instance.user:
-        token = default_token_generator.make_token(instance.user)
+def send_validation_email(sender, instance, created, **kwargs):
+    # On envoie l'email uniquement lorsque l'instance est créée et qu'elle est validée par admin
+    # (ou lorsque le champ validated_by_admin passe de False à True, si vous préférez cette logique)
+    if created and instance.validated_by_admin:
         uid = urlsafe_base64_encode(force_bytes(instance.user.pk))
+        token = default_token_generator.make_token(instance.user)
         reset_link = f"http://{settings.ALLOWED_HOSTS[0]}{reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})}"
         subject = "Votre inscription a été validée"
         message = (
             f"Bonjour {instance.twitch_name},\n\n"
-            f"Votre inscription a été validée.\n"
+            "Votre inscription a été validée par un administrateur.\n"
             f"Pour définir votre mot de passe, cliquez sur ce lien :\n{reset_link}\n\n"
             "Merci et bienvenue !"
         )
