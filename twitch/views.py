@@ -48,18 +48,19 @@ def twitch_wall(request):
 
 def ajax_fetch_streamer_info(request):
     twitch_name = request.GET.get('twitch_name', '').strip()
+    update_mode = request.GET.get('update', 'false').lower() == 'true'
     if not twitch_name:
         return JsonResponse({'error': 'Aucun nom Twitch fourni.'}, status=400)
     
     normalized_name = twitch_name.lower()
     
-    # Vérifier si le streamer est déjà enregistré (insensible à la casse)
-    if Streamer.objects.filter(twitch_name__iexact=normalized_name).exists():
-        return JsonResponse({'error': 'Ce streamer est déjà enregistré.'}, status=400)
-    
-    # Vérifier si le nom est dans la blacklist
-    if BlacklistedStreamer.objects.filter(twitch_name__iexact=normalized_name).exists():
-        return JsonResponse({'error': "Une erreur s'est produite, réessayez plus tard."}, status=400)
+    if not update_mode:
+        # Vérifier si le streamer est déjà enregistré (insensible à la casse)
+        if Streamer.objects.filter(twitch_name__iexact=normalized_name).exists():
+            return JsonResponse({'error': 'Ce streamer est déjà enregistré.'}, status=400)
+        # Vérifier si le nom est dans la blacklist
+        if BlacklistedStreamer.objects.filter(twitch_name__iexact=normalized_name).exists():
+            return JsonResponse({'error': "Une erreur s'est produite, réessayez plus tard."}, status=400)
     
     token = get_twitch_token()
     if not token:

@@ -2,7 +2,7 @@
 {% block title %}Modifier mon Profil{% endblock %}
 {% block content %}
 <div class="container my-4">
-  <!-- Bouton qui ouvre la modale d'édition -->
+  <!-- Bouton pour ouvrir la modale d'édition -->
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileEditModal">
     Modifier mon Profil
   </button>
@@ -19,9 +19,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Rendu complet du formulaire d'inscription (fonctionnel) -->
+          <!-- Rendu complet du formulaire (comme pour l'inscription) -->
           {{ streamer_form.as_p }}
-          <!-- Section réseaux sociaux -->
+          <!-- Section Réseaux Sociaux -->
           <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
             {{ social_formset.management_form }}
@@ -31,6 +31,8 @@
             {{ social_formset.empty_form.as_p }}
           </div>
           <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
+          <!-- Bouton de rafraîchissement via Twitch -->
+          <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -45,7 +47,36 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Gestion de l'ajout dynamique des réseaux sociaux dans la modale
+  // Bouton de rafraîchissement via Twitch
+  const refreshBtn = document.getElementById("refreshTwitchBtn");
+  refreshBtn.addEventListener("click", function() {
+    const twitchName = document.getElementById("id_twitch_name").value.trim();
+    if (!twitchName) {
+      alert("Aucun nom Twitch.");
+      return;
+    }
+    // Ajout du paramètre update=true pour ignorer la vérification de doublon
+    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName) + "&update=true")
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          document.getElementById("id_description").value = data.description;
+          document.getElementById("id_profile_image_url").value = data.profile_image_url;
+          // Mise à jour de l'aperçu de l'image
+          let preview = document.getElementById("profileImagePreview");
+          preview.innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
+          alert("Informations mises à jour !");
+        }
+      })
+      .catch(error => {
+        console.error("Erreur lors de la mise à jour :", error);
+        alert("Une erreur s'est produite, réessayez plus tard.");
+      });
+  });
+
+  // Ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
     const container = document.getElementById("social-accounts-container");
@@ -57,10 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let formIndex = parseInt(totalFormsInput.value);
     const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
     const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
-    const newFormDiv = document.createElement("div");
-    newFormDiv.className = "social-account-form mb-2";
-    newFormDiv.innerHTML = newFormHtml;
-    container.appendChild(newFormDiv);
+    container.insertAdjacentHTML('beforeend', newFormHtml);
     totalFormsInput.value = formIndex + 1;
   });
 });

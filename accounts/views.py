@@ -90,6 +90,7 @@ def user_dashboard(request):
 
 @login_required
 def profile_edit(request):
+    # On suppose que l'utilisateur a un profil streamer lié via 'streamer_profile'
     streamer_profile = getattr(request.user, 'streamer_profile', None)
     if not streamer_profile:
         messages.error(request, "Aucun profil streamer associé à cet utilisateur.")
@@ -102,9 +103,12 @@ def profile_edit(request):
             social_formset.save()
             messages.success(request, "Profil mis à jour.")
             return redirect('accounts:dashboard')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
     else:
         streamer_form = StreamerForm(instance=streamer_profile)
         social_formset = SocialAccountFormSet(instance=streamer_profile, prefix="socialaccount_set")
+        
     return render(request, "accounts/profile_edit.html", {
         "streamer_form": streamer_form,
         "social_formset": social_formset,
