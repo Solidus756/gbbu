@@ -55,23 +55,27 @@ def user_login(request):
 
 @login_required
 def user_dashboard(request):
+    from accounts.forms import StreamerForm, SocialAccountFormSet
     user = request.user
-    # Récupérer le nombre de notifications non lues pour l'utilisateur
     notifications = Notification.objects.filter(recipient_user=user, is_read=False)
     notif_count = notifications.count()
-    
-    # Vérifier le rôle de l'utilisateur
     is_streamer = hasattr(user, 'streamer_profile')
     is_staff = user.groups.filter(name="Staff").exists()
-    
+
     staff_app = None
     if is_staff:
-        # On suppose ici qu'une candidature staff validée (status 'staff' ou 'reserve') est liée à l'email de l'utilisateur
         staff_apps = StaffApplication.objects.filter(email=user.email, status__in=['staff', 'reserve'])
         if staff_apps.exists():
-            # Par exemple, on prend la dernière candidature
             staff_app = staff_apps.latest('created_at')
-    
+            
+    # Pour le profil édition, on transmet le formulaire si l'utilisateur est streamer.
+    if is_streamer:
+        streamer_form = StreamerForm(instance=user.streamer_profile)
+        social_formset = SocialAccountFormSet(instance=user.streamer_profile, prefix="socialaccount_set")
+    else:
+        streamer_form = None
+        social_formset = None
+
     context = {
         'user': user,
         'notif_count': notif_count,
@@ -79,6 +83,8 @@ def user_dashboard(request):
         'is_streamer': is_streamer,
         'is_staff': is_staff,
         'staff_app': staff_app,
+        'streamer_form': streamer_form,
+        'social_formset': social_formset,
     }
     return render(request, 'accounts/dashboard.html', context)
 
