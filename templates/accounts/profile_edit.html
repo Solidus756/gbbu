@@ -19,20 +19,28 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Rendu complet du formulaire (comme pour l'inscription) -->
+          <!-- Rendu complet du formulaire principal (identique au formulaire d'inscription) -->
           {{ streamer_form.as_p }}
+          
+          <!-- Bouton de rafraîchissement via Twitch -->
+          <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
+          
           <!-- Section Réseaux Sociaux -->
           <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
+            <!-- Management form doit rester au-dessus -->
             {{ social_formset.management_form }}
-            {{ social_formset.as_p }}
+            <!-- Conteneur dédié pour les formulaires du formset -->
+            <div id="social-accounts-forms">
+              {{ social_formset.as_p }}
+            </div>
           </div>
           <div id="empty-form-template" style="display: none;">
-            {{ social_formset.empty_form.as_p }}
+            <div class="social-account-form mb-2">
+              {{ social_formset.empty_form.as_p }}
+            </div>
           </div>
           <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
-          <!-- Bouton de rafraîchissement via Twitch -->
-          <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -55,8 +63,10 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    // Ajout du paramètre update=true pour ignorer la vérification de doublon
-    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName) + "&update=true")
+    // Ajout explicite du paramètre update=true
+    var url = "{% url 'twitch:ajax_fetch_streamer_info' %}";
+    url += "?twitch_name=" + encodeURIComponent(twitchName) + "&update=true";
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         if (data.error) {
@@ -64,9 +74,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
           document.getElementById("id_description").value = data.description;
           document.getElementById("id_profile_image_url").value = data.profile_image_url;
-          // Mise à jour de l'aperçu de l'image
-          let preview = document.getElementById("profileImagePreview");
-          preview.innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
+          document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
           alert("Informations mises à jour !");
         }
       })
@@ -76,10 +84,10 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   });
 
-  // Ajout dynamique des réseaux sociaux
+  // Gestion de l'ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
-    const container = document.getElementById("social-accounts-container");
+    const formsContainer = document.getElementById("social-accounts-forms");
     const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
     if (!totalFormsInput) {
       console.error("Management form not found");
@@ -88,7 +96,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let formIndex = parseInt(totalFormsInput.value);
     const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
     const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
-    container.insertAdjacentHTML('beforeend', newFormHtml);
+    // Insérer le nouveau formulaire dans le conteneur dédié
+    formsContainer.insertAdjacentHTML('beforeend', newFormHtml);
     totalFormsInput.value = formIndex + 1;
   });
 });
