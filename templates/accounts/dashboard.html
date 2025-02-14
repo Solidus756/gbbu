@@ -98,7 +98,7 @@
             <p><strong>Status :</strong> {{ staff_app.get_status_display }}</p>
           {% endif %}
           
-          <!-- Bouton qui ouvre la modale d'édition -->
+          <!-- Bouton pour ouvrir la modale d'édition directement -->
           <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#profileEditModal">
             Modifier mon Profil
           </button>
@@ -108,7 +108,7 @@
   </div>
 </div>
 
-<!-- Modale d'édition du profil intégrée dans dashboard.html -->
+<!-- Modale d'édition du profil intégrée -->
 <div class="modal fade" id="profileEditModal" tabindex="-1" aria-labelledby="profileEditModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -121,7 +121,7 @@
         <div class="modal-body">
           <!-- Rendu complet du formulaire principal -->
           {{ streamer_form.as_p }}
-          <!-- Ajout d'un conteneur pour l'aperçu de l'image de chaîne -->
+          <!-- Conteneur pour l'aperçu de l'image de chaîne -->
           <div class="mb-3">
             <label class="form-label">Aperçu de l'image de chaîne</label>
             <div id="profileImagePreview">
@@ -137,7 +137,11 @@
           <div id="social-accounts-container">
             {{ social_formset.management_form }}
             <div id="social-accounts-forms">
-              {{ social_formset.as_p }}
+              {% for form in social_formset %}
+                <div class="social-account-form mb-2">
+                  {{ form.as_p }}
+                </div>
+              {% endfor %}
             </div>
           </div>
           <div id="empty-form-template" style="display: none;">
@@ -160,7 +164,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Bouton de raffraîchissement via Twitch en appelant la vue dédiée
+  // Bouton de raffraîchissement via Twitch avec vue dédiée update
   const refreshBtn = document.getElementById("refreshTwitchBtn");
   refreshBtn.addEventListener("click", function() {
     const twitchName = document.getElementById("id_twitch_name").value.trim();
@@ -168,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    // Construction de l'URL avec update=true et un cache-buster
+    // Construire l'URL avec update=true et cache-buster
     const url = "{% url 'twitch:ajax_update_streamer_info' %}?twitch_name=" 
                 + encodeURIComponent(twitchName) 
                 + "&_=" + new Date().getTime();
@@ -191,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   });
 
-  // Gestion de l'ajout dynamique des réseaux sociaux
+  // Ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
     const container = document.getElementById("social-accounts-forms");
