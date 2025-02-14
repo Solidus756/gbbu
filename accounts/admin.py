@@ -16,14 +16,14 @@ class UserProfileAdmin(admin.ModelAdmin):
     filter_horizontal = ('tags',)
 
 admin.site.register(UserProfile, UserProfileAdmin)
-
+'''
 class StreamerAdmin(admin.ModelAdmin):
     list_display = ('twitch_name', 'email', 'validated_by_admin', 'created_at')
     list_filter = ('validated_by_admin',)
     search_fields = ('twitch_name', 'email')
 
 admin.site.register(Streamer, StreamerAdmin)
-
+'''
 class BlacklistedStreamerAdmin(admin.ModelAdmin):
     list_display = ('twitch_name',)
     search_fields = ('twitch_name',)
