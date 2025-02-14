@@ -45,12 +45,6 @@ class StaffApplicationInline(admin.StackedInline):
     readonly_fields = ('pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi', 'status')
     can_delete = False
 
-class StaffApplicationInline(admin.StackedInline):
-    model = StaffApplication
-    extra = 0
-    readonly_fields = ('pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi', 'status')
-    can_delete = False
-
 @admin.register(Streamer)
 class StreamerAdmin(admin.ModelAdmin):
     list_display = ('twitch_name', 'email', 'validated_by_admin', 'edit_profile_link')
