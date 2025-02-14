@@ -86,6 +86,7 @@
               {% endfor %}
             </ul>
           {% endif %}
+
           {% if is_staff and staff_app %}
             <hr>
             <h5>Détails Staff</h5>
@@ -108,7 +109,7 @@
   </div>
 </div>
 
-<!-- Modale d'édition du profil intégrée -->
+<!-- Modale d'édition du profil intégrée dans dashboard.html -->
 <div class="modal fade" id="profileEditModal" tabindex="-1" aria-labelledby="profileEditModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -119,19 +120,25 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Utilisation du rendu identique au formulaire d'inscription -->
+          <!-- Utilisation du formulaire d'inscription pour l'édition -->
           {{ streamer_form.as_p }}
-          <!-- Section réseaux sociaux -->
+          <!-- Bouton de rafraîchissement via Twitch -->
+          <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
+          
+          <!-- Section Réseaux Sociaux -->
           <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
             {{ social_formset.management_form }}
-            {{ social_formset.as_p }}
+            <div id="social-accounts-forms">
+              {{ social_formset.as_p }}
+            </div>
           </div>
           <div id="empty-form-template" style="display: none;">
-            {{ social_formset.empty_form.as_p }}
+            <div class="social-account-form mb-2">
+              {{ social_formset.empty_form.as_p }}
+            </div>
           </div>
           <button type="button" id="addSocialBtn" class="btn btn-secondary mb-3">Ajouter un réseau</button>
-          <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -146,7 +153,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Bouton de rafraîchissement via Twitch
+  // Bouton de rafraîchissement via Twitch avec la vue dédiée update
   const refreshBtn = document.getElementById("refreshTwitchBtn");
   refreshBtn.addEventListener("click", function() {
     const twitchName = document.getElementById("id_twitch_name").value.trim();
@@ -154,7 +161,10 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
-    fetch("{% url 'twitch:ajax_fetch_streamer_info' %}?twitch_name=" + encodeURIComponent(twitchName))
+    const url = "{% url 'twitch:ajax_update_streamer_info' %}?twitch_name=" 
+                + encodeURIComponent(twitchName) 
+                + "&_=" + new Date().getTime();
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         if (data.error) {
@@ -162,7 +172,8 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
           document.getElementById("id_description").value = data.description;
           document.getElementById("id_profile_image_url").value = data.profile_image_url;
-          document.getElementById("profileImagePreview").innerHTML = '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
+          document.getElementById("profileImagePreview").innerHTML = 
+            '<img src="' + data.profile_image_url + '" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">';
           alert("Informations mises à jour !");
         }
       })
@@ -175,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
-    const container = document.getElementById("social-accounts-container");
+    const container = document.getElementById("social-accounts-forms");
     const totalFormsInput = document.getElementById("id_socialaccount_set-TOTAL_FORMS");
     if (!totalFormsInput) {
       console.error("Management form not found");
@@ -184,10 +195,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let formIndex = parseInt(totalFormsInput.value);
     const emptyFormTemplate = document.getElementById("empty-form-template").innerHTML;
     const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formIndex);
-    const newFormDiv = document.createElement("div");
-    newFormDiv.className = "social-account-form mb-2";
-    newFormDiv.innerHTML = newFormHtml;
-    container.appendChild(newFormDiv);
+    container.insertAdjacentHTML('beforeend', newFormHtml);
     totalFormsInput.value = formIndex + 1;
   });
 });
