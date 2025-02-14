@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'twitch',
     'notifications',
     'acl',
+    'django_form_builder'
 ]
 
 MIDDLEWARE = [
