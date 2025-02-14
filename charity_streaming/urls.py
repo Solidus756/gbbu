@@ -9,7 +9,6 @@ from charity_streaming.views import home
 urlpatterns = [
     path('', home, name='home'),  # Route pour la racine
     path('admin/', admin.site.urls),
-    path('forms/', include('django_form_builder.urls')),  # Ceci expose l'interface de création et de gestion des formulaires
     path('accounts/', include('accounts.urls')),
     path('twitch/', include('twitch.urls')),
     path('notifications/', include('notifications.urls')),
