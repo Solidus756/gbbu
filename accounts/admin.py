@@ -37,11 +37,14 @@ class StaffPositionAdmin(admin.ModelAdmin):
 
 admin.site.register(StaffPosition, StaffPositionAdmin)
 
-class StaffApplicationAdmin(admin.ModelAdmin):
-    list_display = ('pseudo', 'poste_demande', 'status', 'created_at', 'postes_disponibles', 'nombre_reserve', 'get_tags_display')
-    list_filter = ('status', 'poste_demande')
-    search_fields = ('pseudo', 'email')
-    readonly_fields = ('get_tags_display',)
-    
-    # Vous pouvez ajouter ici des actions personnalisées si besoin
-admin.site.register(StaffApplication, StaffApplicationAdmin)
+class StaffApplicationInline(admin.StackedInline):
+    model = StaffApplication
+    extra = 0
+    readonly_fields = ('pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi', 'status')
+    can_delete = False
+
+@admin.register(Streamer)
+class StreamerAdmin(admin.ModelAdmin):
+    list_display = ('twitch_name', 'email', 'validated_by_admin')
+    inlines = [StaffApplicationInline]
+
