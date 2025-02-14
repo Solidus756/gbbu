@@ -46,34 +46,17 @@ class StaffApplicationInline(admin.StackedInline):
     can_delete = False
 
 @admin.register(Streamer)
+@admin.register(Streamer)
 class StreamerAdmin(admin.ModelAdmin):
-    list_display = ('twitch_name', 'email', 'validated_by_admin', 'edit_profile_link')
+    list_display = ('twitch_name', 'email', 'validated_by_admin')
     inlines = [StaffApplicationInline]
     
     def get_readonly_fields(self, request, obj=None):
-        # Par défaut, la vue est en lecture seule
-        if request.GET.get('edit') == 'true':
-            return []  # Mode édition
+        # Retourner tous les champs en lecture seule (si c'est votre choix pour la vue par défaut)
         return [f.name for f in self.model._meta.fields]
-    
-    def edit_profile_link(self, obj):
-        # Bouton dans la liste pour accéder à la page de détail avec ?edit=true
-        url = reverse('admin:accounts_streamer_change', args=[obj.pk])
-        return format_html('<a href="{}?edit=true" class="btn btn-primary">Modifier le profil</a>', url)
-    edit_profile_link.short_description = "Action"
     
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if extra_context is None:
             extra_context = {}
-        if request.GET.get('edit') == 'true':
-            extra_context['title'] = "Édition du profil"
-            extra_context['edit_mode'] = True
-        else:
-            extra_context['title'] = "Aperçu du profil (Lecture seule)"
-            extra_context['edit_mode'] = False
-            edit_url = reverse('admin:accounts_streamer_change', args=[object_id]) + "?edit=true"
-            extra_context['edit_profile_button'] = format_html(
-                '<a href="{}" class="btn btn-primary">Modifier le profil</a>', edit_url
-            )
+        extra_context['title'] = "Aperçu du profil (Lecture seule)"
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
