@@ -57,16 +57,15 @@ class StreamerAdmin(admin.ModelAdmin):
     inlines = [StaffApplicationInline]
     
     def get_readonly_fields(self, request, obj=None):
-        # Si le paramètre GET 'edit' est présent et vaut "true", on autorise l'édition ; sinon, tous les champs sont readonly.
+        # Par défaut, la vue est en lecture seule
         if request.GET.get('edit') == 'true':
-            return []
-        else:
-            return [f.name for f in self.model._meta.fields]
+            return []  # Mode édition
+        return [f.name for f in self.model._meta.fields]
     
     def edit_profile_link(self, obj):
-        # Bouton d'édition dans la liste
+        # Bouton dans la liste pour accéder à la page de détail avec ?edit=true
         url = reverse('admin:accounts_streamer_change', args=[obj.pk])
-        return format_html('<a href="{}?edit=true" class="button">Modifier le profil</a>', url)
+        return format_html('<a href="{}?edit=true" class="btn btn-primary">Modifier le profil</a>', url)
     edit_profile_link.short_description = "Action"
     
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -80,7 +79,7 @@ class StreamerAdmin(admin.ModelAdmin):
             extra_context['edit_mode'] = False
             edit_url = reverse('admin:accounts_streamer_change', args=[object_id]) + "?edit=true"
             extra_context['edit_profile_button'] = format_html(
-                '<div style="margin-bottom: 10px;"><a href="{}" class="btn btn-primary">Modifier le profil</a></div>', edit_url
+                '<a href="{}" class="btn btn-primary">Modifier le profil</a>', edit_url
             )
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
