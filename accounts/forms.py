@@ -9,13 +9,17 @@ class StreamerForm(forms.ModelForm):
         model = Streamer
         fields = ['twitch_name', 'email', 'description', 'discord', 'profile_image_url', 'presence_mode']
         widgets = {
-            'twitch_name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            'twitch_name': forms.TextInput(attrs={'class': 'form-control'}),
             'profile_image_url': forms.HiddenInput(),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'discord': forms.TextInput(attrs={'class': 'form-control'}),
             'presence_mode': forms.Select(attrs={'class': 'form-control'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        # On peut passer un paramètre "readonly" pour l'édition
+        readonly = kwargs.pop('readonly', False)
+        super().__init__(*args, **kwargs)
+        if readonly:
+            self.fields['twitch_name'].widget.attrs.update({'readonly': 'readonly'})
     
     def clean_twitch_name(self):
         tw_name = self.cleaned_data.get('twitch_name', '').strip()
