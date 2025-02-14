@@ -20,11 +20,13 @@
 <div id="content-main">
   <h1>{{ title }}</h1>
   <div class="object-tools">
-    {% if not edit_mode and edit_profile_button %}
+    {# Si nous ne sommes pas en mode édition, affichons le bouton "Modifier le profil" #}
+    {% if not request.GET.edit and edit_profile_button %}
       {{ edit_profile_button|safe }}
     {% endif %}
     {% block object-tools %}{% endblock %}
   </div>
+</div>
 {% endblock %}
 
 {% block content %}
