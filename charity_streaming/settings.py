@@ -13,6 +13,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://gb.intradc.ovh',  # Ajoutez votre domaine ici
 ]
 
+DJANGO_FORM_BUILDER_FORM_MODEL = 'accounts.MyForm'
+
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',

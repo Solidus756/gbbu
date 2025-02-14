@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django_form_builder.models import AbstractForm
 
 PRESENCE_CHOICES = [
     ("PR", "Présentiel"),
@@ -148,9 +149,37 @@ class SMTPConfig(models.Model):
     
 User = get_user_model()
 
+class MyForm(AbstractForm):
+    # Vous pouvez ajouter des champs ou méthodes spécifiques si nécessaire
+    class Meta:
+        verbose_name = "Formulaire"
+        verbose_name_plural = "Formulaires"
+
 class FormSubmission(models.Model):
     # Au lieu de référencer 'django_form_builder.Form'
     form = models.ForeignKey('django_form_builder.Form', on_delete=models.CASCADE)
+    data = models.JSONField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Submission for {self.form} at {self.submitted_at}"
+    
+class MyForm(AbstractForm):
+    """
+    Ce modèle concret hérite de l'abstract form model de django-form-builder.
+    Il sera utilisé pour définir les formulaires dynamiques.
+    """
+    class Meta:
+        verbose_name = "Formulaire"
+        verbose_name_plural = "Formulaires"
+
+class FormSubmission(models.Model):
+    """
+    Ce modèle stocke les réponses soumises pour un formulaire dynamique.
+    La relation 'form' pointe vers le modèle concret MyForm.
+    """
+    form = models.ForeignKey('accounts.MyForm', on_delete=models.CASCADE)
     data = models.JSONField()
     submitted_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
