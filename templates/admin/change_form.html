@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<div id="breadcrumbs">
+    {% block nav_global %}
+    <ul class="breadcrumbs">
+        <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
+        <li>{{ opts.verbose_name_plural|capfirst }}</li>
+    </ul>
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block content_title %}
+<div id="content-main">
+  <h1>{{ title }}</h1>
+  <div class="object-tools">
+    {% if not edit_mode and edit_profile_button %}
+      {{ edit_profile_button|safe }}
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  {% if change %}
+    <form method="post" action="" id="change_form" novalidate>
+      {% csrf_token %}
+      {% if adminform.form.non_field_errors %}
+      <div class="errornote">
+        <ul>
+          {% for error in adminform.form.non_field_errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <table>
+        {{ adminform.form.as_table }}
+      </table>
+      {% block submit_buttons_bottom %}
+      <div class="submit-row">
+        {% if show_save_and_continue %}
+          <input type="submit" value="{% trans "Save and continue editing" %}" name="_continue" class="default" />
+        {% endif %}
+        <input type="submit" value="{% trans "Save" %}" name="_save" class="default" />
+      </div>
+      {% endblock %}
+    </form>
+  {% else %}
+    {{ adminform.form.as_table }}
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block footer %}
+<div id="footer">
+  {% block copyright %}
+  <p>{% trans "Django administration" %}</p>
+  {% endblock %}
+</div>
+{% endblock %}
