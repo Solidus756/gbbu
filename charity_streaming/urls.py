@@ -9,8 +9,8 @@ from charity_streaming.views import home
 urlpatterns = [
     path('', home, name='home'),  # Route pour la racine
     path('admin/', admin.site.urls),
-    path('jet/', include(('jet.urls', 'jet'), namespace='jet')),
-    path('jet/dashboard/', include(('jet.dashboard.urls', 'jet-dashboard'), namespace='jet-dashboard')),
+    #path('jet/', include(('jet.urls', 'jet'), namespace='jet')),
+    #path('jet/dashboard/', include(('jet.dashboard.urls', 'jet-dashboard'), namespace='jet-dashboard')),
     path('accounts/', include('accounts.urls')),
     path('twitch/', include('twitch.urls')),
     path('notifications/', include('notifications.urls')),
