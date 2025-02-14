@@ -45,30 +45,42 @@ class StaffApplicationInline(admin.StackedInline):
     readonly_fields = ('pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi', 'status')
     can_delete = False
 
+class StaffApplicationInline(admin.StackedInline):
+    model = StaffApplication
+    extra = 0
+    readonly_fields = ('pseudo', 'pseudo_discord', 'pseudo_twitch', 'email', 'poste_demande', 'pourquoi', 'status')
+    can_delete = False
+
 @admin.register(Streamer)
 class StreamerAdmin(admin.ModelAdmin):
     list_display = ('twitch_name', 'email', 'validated_by_admin', 'edit_profile_link')
     inlines = [StaffApplicationInline]
     
     def get_readonly_fields(self, request, obj=None):
-        # Si le paramètre "edit" n'est pas présent, tous les champs sont readonly.
+        # Si le paramètre GET 'edit' est présent et vaut "true", on autorise l'édition ; sinon, tous les champs sont readonly.
         if request.GET.get('edit') == 'true':
-            return []  # Mode édition : aucun champ n'est en lecture seule.
-        return [f.name for f in self.model._meta.fields]
+            return []
+        else:
+            return [f.name for f in self.model._meta.fields]
     
     def edit_profile_link(self, obj):
-        # Ce bouton apparait dans la liste et renvoie à la page de changement avec ?edit=true
+        # Bouton d'édition dans la liste
         url = reverse('admin:accounts_streamer_change', args=[obj.pk])
         return format_html('<a href="{}?edit=true" class="button">Modifier le profil</a>', url)
     edit_profile_link.short_description = "Action"
-
+    
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if extra_context is None:
             extra_context = {}
-        # On peut ajouter un titre personnalisé selon le mode
         if request.GET.get('edit') == 'true':
             extra_context['title'] = "Édition du profil"
+            extra_context['edit_mode'] = True
         else:
             extra_context['title'] = "Aperçu du profil (Lecture seule)"
+            extra_context['edit_mode'] = False
+            edit_url = reverse('admin:accounts_streamer_change', args=[object_id]) + "?edit=true"
+            extra_context['edit_profile_button'] = format_html(
+                '<div style="margin-bottom: 10px;"><a href="{}" class="btn btn-primary">Modifier le profil</a></div>', edit_url
+            )
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
