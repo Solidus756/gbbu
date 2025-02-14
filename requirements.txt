@@ -3,3 +3,4 @@ django-jazzmin
 python-dotenv
 requests
 psycopg2
+django-form-builder
