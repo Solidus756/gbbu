@@ -46,7 +46,6 @@ class StaffApplicationInline(admin.StackedInline):
     can_delete = False
 
 @admin.register(Streamer)
-@admin.register(Streamer)
 class StreamerAdmin(admin.ModelAdmin):
     list_display = ('twitch_name', 'email', 'validated_by_admin')
     inlines = [StaffApplicationInline]
