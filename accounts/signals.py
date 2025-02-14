@@ -70,3 +70,23 @@ def add_tags_to_staff_application(sender, instance, created, **kwargs):
         tag_reserve, _ = Tag.objects.get_or_create(name=tag_reserve_name)
         instance.tags.add(tag_reserve)
         logger.info("Tag ajouté pour status 'reserve' : %s", tag_reserve_name)
+
+@receiver(post_save, sender=StaffApplication)
+def link_staff_application_to_streamer(sender, instance, created, **kwargs):
+    """
+    Lorsqu'une candidature staff est créée ou modifiée, si aucun lien n'est déjà défini,
+    on recherche un Streamer avec un email identique (ou, en alternative, un twitch_name identique)
+    et on lie la candidature à ce Streamer.
+    """
+    if not instance.streamer:
+        # Recherche par email
+        streamer_qs = Streamer.objects.filter(email__iexact=instance.email)
+        if streamer_qs.exists():
+            instance.streamer = streamer_qs.first()
+            instance.save(update_fields=['streamer'])
+        else:
+            # Si pas trouvé par email, recherche par pseudo_twitch
+            streamer_qs = Streamer.objects.filter(twitch_name__iexact=instance.pseudo_twitch)
+            if streamer_qs.exists():
+                instance.streamer = streamer_qs.first()
+                instance.save(update_fields=['streamer'])
