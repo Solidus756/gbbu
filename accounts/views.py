@@ -168,14 +168,27 @@ def public_registration(request):
         'staff_form': staff_form,
         'social_formset': social_formset,
     })
-'''
-def home(request):
-    streamer_form = StreamerForm()
-    staff_form = StaffApplicationForm()
-    social_formset = SocialAccountFormSet(prefix="socialaccount_set")
-    return render(request, 'home.html', {
-        'streamer_form': streamer_form,
-        'staff_form': staff_form,
-        'social_formset': social_formset,
+    
+@login_required
+def profile_edit(request):
+    streamer_profile = getattr(request.user, 'streamer_profile', None)
+    if not streamer_profile:
+        messages.error(request, "Aucun profil streamer associé à cet utilisateur.")
+        return redirect('accounts:dashboard')
+    if request.method == 'POST':
+        streamer_form = StreamerForm(request.POST, instance=streamer_profile)
+        social_formset = SocialAccountFormSet(request.POST, instance=streamer_profile, prefix="socialaccount_set")
+        if streamer_form.is_valid() and social_formset.is_valid():
+            streamer_form.save()
+            social_formset.save()
+            messages.success(request, "Profil mis à jour.")
+            return redirect('accounts:dashboard')
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        streamer_form = StreamerForm(instance=streamer_profile)
+        social_formset = SocialAccountFormSet(instance=streamer_profile, prefix="socialaccount_set")
+    return render(request, "accounts/profile_edit.html", {
+        "streamer_form": streamer_form,
+        "social_formset": social_formset,
     })
-'''
