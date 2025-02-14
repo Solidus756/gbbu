@@ -1,18 +1,18 @@
-{% extends "admin/base_site.html" %}
+{% extends "jazzmin/base.html" %}
 {% load i18n admin_urls static %}
 
 {% block extrastyle %}
-    {{ block.super }}
+  {{ block.super }}
 {% endblock %}
 
 {% block breadcrumbs %}
 <div id="breadcrumbs">
-    {% block nav_global %}
-    <ul class="breadcrumbs">
-        <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
-        <li>{{ opts.verbose_name_plural|capfirst }}</li>
-    </ul>
-    {% endblock %}
+  {% block nav_global %}
+  <ul class="breadcrumbs">
+    <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
+    <li>{{ opts.verbose_name_plural|capfirst }}</li>
+  </ul>
+  {% endblock %}
 </div>
 {% endblock %}
 
@@ -23,7 +23,9 @@
     {% if not edit_mode and edit_profile_button %}
       {{ edit_profile_button|safe }}
     {% endif %}
+    {% block object-tools %}{% endblock %}
   </div>
+</div>
 {% endblock %}
 
 {% block content %}
