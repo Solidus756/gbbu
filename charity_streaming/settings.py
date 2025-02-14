@@ -70,6 +70,22 @@ DATABASES = {
     }
 }
 
+JAZZMIN_SETTINGS = {
+    "site_title": "Mon Admin",
+    "site_header": "Administration",
+    "site_brand": "Mon Site",
+    "welcome_sign": "Bienvenue dans l'administration",
+    "topmenu_links": [
+        {"name": "Accueil", "url": "admin:index", "permissions": ["auth.view_user"]},
+    ],
+    # Ajoutez d'autres options selon vos besoins
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",  # Vous pouvez choisir parmi plusieurs thèmes Bootstrap
+    "navbar_small_text": True,
+}
+
 LANGUAGE_CODE = 'fr-be'
 TIME_ZONE = 'Europe/Brussels'
 USE_I18N = True
