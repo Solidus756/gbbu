@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
+from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.models import Group, User
-from .models import Streamer, Staff, Tag, UserProfile,  BlacklistedStreamer, StaffPosition, StaffApplication, SMTPConfig
-from django_form_builder.models import Submission
+from .models import Streamer, Staff, Tag, UserProfile,  BlacklistedStreamer, StaffPosition, StaffApplication, SMTPConfig, FormSubmission
 
 admin.site.register(SMTPConfig)
 
@@ -61,12 +61,12 @@ class StreamerAdmin(admin.ModelAdmin):
         extra_context['title'] = "Aperçu du profil (Lecture seule)"
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
-class SubmissionResource(resources.ModelResource):
+class FormSubmissionResource(resources.ModelResource):
     class Meta:
-        model = Submission
-        # Vous pouvez configurer les champs à inclure/exclure ici
+        model = FormSubmission
+        # Vous pouvez préciser les champs à inclure ou exclure
 
-@admin.register(Submission)
-class SubmissionAdmin(ImportExportModelAdmin):
-    resource_class = SubmissionResource
-    list_display = ('form', 'submitted_at', 'user')  # Adaptez selon la structure de votre modèle Submission
+@admin.register(FormSubmission)
+class FormSubmissionAdmin(ImportExportModelAdmin):
+    resource_class = FormSubmissionResource
+    list_display = ('form', 'submitted_at', 'user')

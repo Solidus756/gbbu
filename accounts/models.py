@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 PRESENCE_CHOICES = [
     ("PR", "Présentiel"),
@@ -144,3 +145,14 @@ class SMTPConfig(models.Model):
 
     def __str__(self):
         return f"Configuration SMTP ({self.host}:{self.port})"
+    
+User = get_user_model()
+
+class FormSubmission(models.Model):
+    form = models.ForeignKey('django_form_builder.Form', on_delete=models.CASCADE)
+    data = models.JSONField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Submission for {self.form} at {self.submitted_at}"
