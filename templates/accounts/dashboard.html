@@ -86,7 +86,6 @@
               {% endfor %}
             </ul>
           {% endif %}
-
           {% if is_staff and staff_app %}
             <hr>
             <h5>Détails Staff</h5>
@@ -99,7 +98,7 @@
             <p><strong>Status :</strong> {{ staff_app.get_status_display }}</p>
           {% endif %}
           
-          <!-- Bouton pour ouvrir la modale d'édition -->
+          <!-- Bouton qui ouvre la modale d'édition -->
           <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#profileEditModal">
             Modifier mon Profil
           </button>
@@ -120,11 +119,19 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
         <div class="modal-body">
-          <!-- Utilisation du formulaire d'inscription pour l'édition -->
+          <!-- Rendu complet du formulaire principal -->
           {{ streamer_form.as_p }}
-          <!-- Bouton de rafraîchissement via Twitch -->
+          <!-- Ajout d'un conteneur pour l'aperçu de l'image de chaîne -->
+          <div class="mb-3">
+            <label class="form-label">Aperçu de l'image de chaîne</label>
+            <div id="profileImagePreview">
+              {% if user.streamer_profile.profile_image_url %}
+                <img src="{{ user.streamer_profile.profile_image_url }}" alt="Image de chaîne" class="img-fluid" style="max-width:200px;">
+              {% endif %}
+            </div>
+          </div>
+          <!-- Bouton de raffraîchissement via Twitch -->
           <button type="button" id="refreshTwitchBtn" class="btn btn-secondary mb-3">Raffraichir via Twitch</button>
-          
           <!-- Section Réseaux Sociaux -->
           <h4>Réseaux Sociaux</h4>
           <div id="social-accounts-container">
@@ -153,7 +160,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Bouton de rafraîchissement via Twitch avec la vue dédiée update
+  // Bouton de raffraîchissement via Twitch en appelant la vue dédiée
   const refreshBtn = document.getElementById("refreshTwitchBtn");
   refreshBtn.addEventListener("click", function() {
     const twitchName = document.getElementById("id_twitch_name").value.trim();
@@ -161,6 +168,7 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("Aucun nom Twitch.");
       return;
     }
+    // Construction de l'URL avec update=true et un cache-buster
     const url = "{% url 'twitch:ajax_update_streamer_info' %}?twitch_name=" 
                 + encodeURIComponent(twitchName) 
                 + "&_=" + new Date().getTime();
@@ -183,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   });
 
-  // Ajout dynamique des réseaux sociaux
+  // Gestion de l'ajout dynamique des réseaux sociaux
   const addSocialBtn = document.getElementById("addSocialBtn");
   addSocialBtn.addEventListener("click", function() {
     const container = document.getElementById("social-accounts-forms");
