@@ -90,13 +90,12 @@ def user_dashboard(request):
 
 @login_required
 def profile_edit(request):
-    # On suppose que l'utilisateur a un profil streamer lié via 'streamer_profile'
     streamer_profile = getattr(request.user, 'streamer_profile', None)
     if not streamer_profile:
         messages.error(request, "Aucun profil streamer associé à cet utilisateur.")
         return redirect('accounts:dashboard')
     if request.method == 'POST':
-        streamer_form = StreamerForm(request.POST, instance=streamer_profile)
+        streamer_form = StreamerForm(request.POST, instance=streamer_profile, readonly=True)
         social_formset = SocialAccountFormSet(request.POST, instance=streamer_profile, prefix="socialaccount_set")
         if streamer_form.is_valid() and social_formset.is_valid():
             streamer_form.save()
@@ -104,15 +103,15 @@ def profile_edit(request):
             messages.success(request, "Profil mis à jour.")
             return redirect('accounts:dashboard')
         else:
-            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+            messages.error(request, "Veuillez corriger les erreurs.")
     else:
-        streamer_form = StreamerForm(instance=streamer_profile)
+        streamer_form = StreamerForm(instance=streamer_profile, readonly=True)
         social_formset = SocialAccountFormSet(instance=streamer_profile, prefix="socialaccount_set")
-        
     return render(request, "accounts/profile_edit.html", {
         "streamer_form": streamer_form,
         "social_formset": social_formset,
     })
+
 
 def public_registration(request):
     if request.method == "POST":
