@@ -150,7 +150,7 @@ User = get_user_model()
 
 class FormSubmission(models.Model):
     # Au lieu de référencer 'django_form_builder.Form'
-    form = models.ForeignKey('django_form_builder.FormDefinition', on_delete=models.CASCADE)
+    form = models.ForeignKey('django_form_builder.Form', on_delete=models.CASCADE)
     data = models.JSONField()
     submitted_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
